@@ -48,6 +48,7 @@ export default function RolePage() {
   const [role, setRole] = useState("");
   const [customRole, setCustomRole] = useState("");
   const [domain, setDomain] = useState("");
+  const [company, setCompany] = useState("");
   const [profYears, setProfYears] = useState("");
   const [practiceYears, setPracticeYears] = useState("");
 
@@ -100,6 +101,7 @@ export default function RolePage() {
                 ...existing,
                 type: effectiveRole,
                 domain,
+                company: role === "professional" ? company.trim() : "",
                 experience: Number(profYears) || 0,
                 practiceYears: Number(practiceYears) || 0,
               };
@@ -109,6 +111,9 @@ export default function RolePage() {
               await api.me.update({
                 personType: effectiveRole,
                 domain,
+                ...(role === "professional" && company.trim()
+                  ? { company: company.trim() }
+                  : {}),
                 experience: Number(profYears) || 0,
                 practiceYears: Number(practiceYears) || 0,
               });
@@ -174,6 +179,29 @@ export default function RolePage() {
               allowCustom
             />
           </div>
+
+          {role === "professional" && (
+            <div className="flex flex-col gap-2">
+              <label
+                htmlFor="company"
+                className="text-[11px] uppercase tracking-[0.12em] text-gray-5"
+              >
+                Company{" "}
+                <span className="text-gray-4 normal-case tracking-normal">
+                  (optional)
+                </span>
+              </label>
+              <input
+                id="company"
+                type="text"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                placeholder="e.g. Google, Acme Inc."
+                maxLength={80}
+                className="w-full bg-gray-1/50 backdrop-blur-md border-[0.5px] border-white/10 rounded-full px-5 py-[13px] text-cream text-sm outline-none placeholder:text-gray-4 transition-colors focus:border-white/30"
+              />
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-4">
             <label className="flex flex-col gap-2">

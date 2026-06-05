@@ -16,6 +16,8 @@ type ProfileData = {
   role: string;
   location: string;
   type: ProfileType;
+  company: string;
+  education: string;
   experience: number;
   domain: string;
   intent: Intent;
@@ -34,6 +36,8 @@ const DEFAULT_PROFILE: ProfileData = {
   role: "",
   location: "",
   type: "professional",
+  company: "",
+  education: "",
   experience: 1,
   domain: "",
   intent: "networking",
@@ -275,6 +279,8 @@ export default function ProfilePage() {
           role: me.role ?? p.role,
           location: me.location ?? p.location,
           type: (me.personType ?? p.type) as ProfileData["type"],
+          company: me.company ?? p.company,
+          education: me.education ?? p.education,
           experience: me.experience ?? p.experience,
           domain: me.domain ?? p.domain,
           intent: (me.findMeFor?.[0] ?? p.intent) as ProfileData["intent"],
@@ -340,6 +346,8 @@ export default function ProfilePage() {
         personType: profile.type
           ? (profile.type as "student" | "professional" | "freelancer")
           : undefined,
+        company: profile.company || undefined,
+        education: profile.education || undefined,
         experience: profile.experience,
         domain: profile.domain || undefined,
         skills: profile.skills,
@@ -652,6 +660,25 @@ export default function ProfilePage() {
               </div>
             </Section>
 
+            <Section title="Education & Company">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <Field label="Education">
+                  <TextInput
+                    value={profile.education}
+                    onChange={(v) => update("education", v)}
+                    placeholder="e.g. B.Tech, IIT Bombay"
+                  />
+                </Field>
+                <Field label="Company">
+                  <TextInput
+                    value={profile.company}
+                    onChange={(v) => update("company", v)}
+                    placeholder="e.g. Google"
+                  />
+                </Field>
+              </div>
+            </Section>
+
             <Section title="People can find you for">
               <div className="flex flex-col gap-4">
                 {findTagsDomainSpecific.length > 0 && (
@@ -935,7 +962,11 @@ function ProfilePreview({ profile }: { profile: ProfileData }) {
           </h2>
           <div className="text-[13px] text-gray-5">
             {profile.role || "Add a role"}
+            {profile.company ? ` · ${profile.company}` : ""}
           </div>
+          {profile.education && (
+            <div className="text-[12px] text-gray-5">🎓 {profile.education}</div>
+          )}
           <div className="text-[12px] text-gray-5">
             {profile.location || "Add a location"} ·{" "}
             {profile.experience} yr{profile.experience === 1 ? "" : "s"}

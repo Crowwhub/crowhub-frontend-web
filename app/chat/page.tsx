@@ -1,33 +1,35 @@
 "use client";
 
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
+import { useChatSocket } from "@/lib/useChatSocket";
+import {
+  api,
+  ApiError,
+  type ChatMessage,
+  type MatchRecord,
+} from "@/lib/api";
 
 /* ============================================================ Types & data */
 
 type Accent = "sage" | "amber";
 
 type Conversation = {
-  id: string;
+  matchId: string;
+  userId: string;
   name: string;
   emoji: string;
   accent: Accent;
   role: string;
   company: string;
-  intent: "Project Collab" | "Hiring" | "Referral" | "Networking";
-  online: boolean;
-  unread: number;
+  intent: string;
+  createdAt: string;
 };
 
-type Message = {
+// View-model for a rendered bubble, derived from a ChatMessage.
+type ViewMessage = {
   id: string;
-  convId: string;
   from: "me" | "them";
   text: string;
   time: string;
@@ -39,112 +41,41 @@ const ACCENT_HEX: Record<Accent, string> = {
   amber: "#e09b45",
 };
 
-const CONVERSATIONS: Conversation[] = [
-  {
-    id: "m1",
-    name: "Aarav Mehta",
-    emoji: "🐦‍⬛",
-    accent: "sage",
-    role: "Product Designer",
-    company: "Zyra Labs",
-    intent: "Project Collab",
-    online: true,
-    unread: 2,
-  },
-  {
-    id: "m2",
-    name: "Tara Singh",
-    emoji: "🦉",
-    accent: "amber",
-    role: "CTO",
-    company: "Lensit",
-    intent: "Hiring",
-    online: true,
-    unread: 0,
-  },
-  {
-    id: "m3",
-    name: "Priya Joshi",
-    emoji: "🦢",
-    accent: "sage",
-    role: "UI Designer",
-    company: "Freelance",
-    intent: "Networking",
-    online: false,
-    unread: 1,
-  },
-  {
-    id: "m5",
-    name: "Maya Bhatt",
-    emoji: "🐧",
-    accent: "sage",
-    role: "Visual Designer",
-    company: "Studio Six",
-    intent: "Networking",
-    online: false,
-    unread: 0,
-  },
-  {
-    id: "m6",
-    name: "Sara Mehra",
-    emoji: "🦜",
-    accent: "amber",
-    role: "Long-form Writer",
-    company: "Wired",
-    intent: "Project Collab",
-    online: true,
-    unread: 3,
-  },
-  {
-    id: "m8",
-    name: "Kavya Iyer",
-    emoji: "🦆",
-    accent: "amber",
-    role: "Data Scientist",
-    company: "Acuity Health",
-    intent: "Hiring",
-    online: false,
-    unread: 0,
-  },
-];
+function toConversation(m: MatchRecord): Conversation {
+  const u = m.user;
+  const accent: Accent = (u.id.charCodeAt(0) || 0) % 2 === 0 ? "sage" : "amber";
+  return {
+    matchId: m.matchId,
+    userId: u.id,
+    name: u.name ?? u.username,
+    emoji: u.avatar ?? "🐦‍⬛",
+    accent,
+    role: u.role ?? "",
+    company: u.location ?? "",
+    intent: m.intent ?? "",
+    createdAt: m.createdAt,
+  };
+}
 
-const SEED_MESSAGES: Message[] = [
-  // m1 — Aarav
-  { id: "x1", convId: "m1", from: "them", text: "Hey! Saw your profile on CrowHub — love your design work.", time: "10:24 AM", day: "Yesterday" },
-  { id: "x2", convId: "m1", from: "me", text: "Thanks Aarav, appreciate that 🙌", time: "10:31 AM", day: "Yesterday" },
-  { id: "x3", convId: "m1", from: "them", text: "We're building a payments product at Zyra and could use a hand on the onboarding flow. Open to a quick call this week?", time: "10:32 AM", day: "Yesterday" },
-  { id: "x4", convId: "m1", from: "me", text: "Yeah I'd love to. What does your Thursday afternoon look like?", time: "9:02 AM", day: "Today" },
-  { id: "x5", convId: "m1", from: "them", text: "Thursday 3pm works for me!", time: "9:14 AM", day: "Today" },
-  { id: "x6", convId: "m1", from: "them", text: "I'll drop a calendar invite later today.", time: "9:14 AM", day: "Today" },
+/* ============================================================ Time helpers */
 
-  // m2 — Tara
-  { id: "y1", convId: "m2", from: "them", text: "Hi! We're hiring senior engineers at Lensit — would love your help with referrals.", time: "Tue", day: "This week" },
-  { id: "y2", convId: "m2", from: "me", text: "Happy to share. What's the stack?", time: "Tue", day: "This week" },
-  { id: "y3", convId: "m2", from: "them", text: "Go on the backend, React + TS on the front. Anyone in your network in Bangalore?", time: "Tue", day: "This week" },
+function formatTime(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+}
 
-  // m3 — Priya
-  { id: "z1", convId: "m3", from: "them", text: "Hey! Loved your portfolio.", time: "Mon", day: "This week" },
-  { id: "z2", convId: "m3", from: "me", text: "Thank you Priya 🙏", time: "Mon", day: "This week" },
-  { id: "z3", convId: "m3", from: "them", text: "Quick question — how do you handle clients who want endless revisions?", time: "Mon", day: "This week" },
-
-  // m5 — Maya (empty)
-
-  // m6 — Sara
-  { id: "w1", convId: "m6", from: "them", text: "Hi! I'm working on a piece about indie design studios in India.", time: "Sun", day: "Last week" },
-  { id: "w2", convId: "m6", from: "them", text: "Would love to quote you. Got 10 min for a phone interview?", time: "Sun", day: "Last week" },
-  { id: "w3", convId: "m6", from: "them", text: "👋 Bumping in case you missed this!", time: "9:15 AM", day: "Today" },
-
-  // m8 — Kavya
-  { id: "v1", convId: "m8", from: "them", text: "Hello! I came across your data viz work — really clean.", time: "May 18", day: "Earlier" },
-  { id: "v2", convId: "m8", from: "me", text: "Thanks Kavya, that means a lot.", time: "May 18", day: "Earlier" },
-];
-
-const INTENT_BADGE: Record<Conversation["intent"], string> = {
-  "Project Collab": "Collab",
-  Hiring: "Hiring",
-  Referral: "Referral",
-  Networking: "Networking",
-};
+function dayLabel(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const startOfDay = (x: Date) =>
+    new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const diff = Math.round((startOfDay(new Date()) - startOfDay(d)) / 86400000);
+  if (diff <= 0) return "Today";
+  if (diff === 1) return "Yesterday";
+  if (diff < 7) return d.toLocaleDateString("en-US", { weekday: "long" });
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
 
 /* ============================================================ Page */
 
@@ -152,71 +83,164 @@ export default function ChatPage() {
   const searchParams = useSearchParams();
   const initialWith = searchParams?.get("with") ?? null;
 
-  const [conversations, setConversations] =
-    useState<Conversation[]>(CONVERSATIONS);
-  const [messages, setMessages] = useState<Message[]>(SEED_MESSAGES);
+  const [myId, setMyId] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [unread, setUnread] = useState<Record<string, number>>({});
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [composer, setComposer] = useState("");
   const [search, setSearch] = useState("");
-  const [selectedId, setSelectedId] = useState<string | null>(() => {
-    if (initialWith && CONVERSATIONS.some((c) => c.id === initialWith))
-      return initialWith;
-    return CONVERSATIONS[0]?.id ?? null;
-  });
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const composerRef = useRef<HTMLTextAreaElement>(null);
+  const selectedIdRef = useRef<string | null>(null);
+  selectedIdRef.current = selectedId;
+  const loadedHistory = useRef<Set<string>>(new Set());
 
-  const selected = conversations.find((c) => c.id === selectedId) ?? null;
+  // Append a message, de-duping by id (history reloads + socket echoes overlap).
+  const appendMessage = useCallback((msg: ChatMessage) => {
+    setMessages((prev) =>
+      prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]
+    );
+  }, []);
 
-  const convMessages = useMemo(
-    () => messages.filter((m) => m.convId === selectedId),
-    [messages, selectedId]
+  // Live messages from the socket.
+  const onSocketMessage = useCallback(
+    (msg: ChatMessage) => {
+      appendMessage(msg);
+      const isMine = !!myId && msg.senderId === myId;
+      if (!isMine && msg.matchId !== selectedIdRef.current) {
+        setUnread((u) => ({ ...u, [msg.matchId]: (u[msg.matchId] ?? 0) + 1 }));
+      }
+    },
+    [appendMessage, myId]
   );
 
+  const roomIds = useMemo(
+    () => conversations.map((c) => c.matchId),
+    [conversations]
+  );
+  const { sendMessage: socketSend } = useChatSocket({
+    roomIds,
+    onMessage: onSocketMessage,
+  });
+
+  // Initial load: current user + conversations.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [me, matches] = await Promise.all([
+          api.me.get(),
+          api.matches.list(),
+        ]);
+        if (cancelled) return;
+        setMyId(me.id);
+        const convs = matches.map(toConversation);
+        setConversations(convs);
+        // Select the conversation from ?with=<userId>, else the first.
+        const fromParam = initialWith
+          ? convs.find((c) => c.userId === initialWith)
+          : undefined;
+        setSelectedId(fromParam?.matchId ?? convs[0]?.matchId ?? null);
+        setLoadError(null);
+      } catch (err) {
+        if (!cancelled) {
+          if (err instanceof ApiError && err.status === 401) {
+            window.location.href = "/auth/login";
+            return;
+          }
+          setLoadError(
+            err instanceof ApiError ? err.message : "Couldn't load chats."
+          );
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [initialWith]);
+
+  // Load history for a conversation the first time it's opened, clear its unread.
+  useEffect(() => {
+    if (!selectedId) return;
+    setUnread((u) => (u[selectedId] ? { ...u, [selectedId]: 0 } : u));
+    if (loadedHistory.current.has(selectedId)) return;
+    loadedHistory.current.add(selectedId);
+    let cancelled = false;
+    (async () => {
+      try {
+        const history = await api.chat.history(selectedId);
+        if (cancelled) return;
+        setMessages((prev) => {
+          const seen = new Set(prev.map((m) => m.id));
+          const fresh = history.filter((m) => !seen.has(m.id));
+          return fresh.length ? [...prev, ...fresh] : prev;
+        });
+      } catch {
+        // Allow a retry on next open if history failed to load.
+        loadedHistory.current.delete(selectedId);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedId]);
+
+  const convMessages = useMemo<ViewMessage[]>(() => {
+    if (!selectedId) return [];
+    return messages
+      .filter((m) => m.matchId === selectedId)
+      .sort((a, b) => +new Date(a.createdAt) - +new Date(b.createdAt))
+      .map((m) => ({
+        id: m.id,
+        from: myId && m.senderId === myId ? "me" : "them",
+        text: m.message,
+        time: formatTime(m.createdAt),
+        day: dayLabel(m.createdAt),
+      }));
+  }, [messages, selectedId, myId]);
+
+  // Last message per conversation, for the list preview + ordering.
   const lastByConv = useMemo(() => {
-    const map: Record<string, Message> = {};
+    const map: Record<string, ChatMessage> = {};
     for (const m of messages) {
-      map[m.convId] = m;
+      const cur = map[m.matchId];
+      if (!cur || +new Date(m.createdAt) >= +new Date(cur.createdAt)) {
+        map[m.matchId] = m;
+      }
     }
     return map;
   }, [messages]);
 
+  const orderedConvs = useMemo(() => {
+    const stamp = (c: Conversation) =>
+      +new Date(lastByConv[c.matchId]?.createdAt ?? c.createdAt);
+    return [...conversations].sort((a, b) => stamp(b) - stamp(a));
+  }, [conversations, lastByConv]);
+
   const filteredConvs = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return conversations;
-    return conversations.filter((c) =>
+    if (!q) return orderedConvs;
+    return orderedConvs.filter((c) =>
       [c.name, c.role, c.company].some((s) => s.toLowerCase().includes(q))
     );
-  }, [conversations, search]);
+  }, [orderedConvs, search]);
+
+  const selected = conversations.find((c) => c.matchId === selectedId) ?? null;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [convMessages.length]);
-
-  useEffect(() => {
-    if (!selectedId) return;
-    setConversations((cs) =>
-      cs.map((c) => (c.id === selectedId ? { ...c, unread: 0 } : c))
-    );
-  }, [selectedId]);
+  }, [convMessages.length, selectedId]);
 
   function sendMessage() {
     const text = composer.trim();
-    if (!text || !selectedId) return;
-    const now = new Date();
-    const time = now.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-    });
-    const newMsg: Message = {
-      id: `msg-${Date.now()}`,
-      convId: selectedId,
-      from: "me",
-      text,
-      time,
-      day: "Today",
-    };
-    setMessages((prev) => [...prev, newMsg]);
+    if (!text || !selectedId || !myId) return;
+    socketSend(selectedId, myId, text);
     setComposer("");
     composerRef.current?.focus();
   }
@@ -230,8 +254,12 @@ export default function ChatPage() {
           selectedId={selectedId}
           onSelect={setSelectedId}
           lastByConv={lastByConv}
+          unread={unread}
+          myId={myId}
           search={search}
           setSearch={setSearch}
+          loading={loading}
+          error={loadError}
         />
 
         {selected ? (
@@ -245,7 +273,7 @@ export default function ChatPage() {
             composerRef={composerRef}
           />
         ) : (
-          <EmptyConv />
+          <EmptyConv loading={loading} hasConversations={conversations.length > 0} />
         )}
       </main>
     </div>
@@ -259,15 +287,23 @@ function ConvList({
   selectedId,
   onSelect,
   lastByConv,
+  unread,
+  myId,
   search,
   setSearch,
+  loading,
+  error,
 }: {
   conversations: Conversation[];
   selectedId: string | null;
   onSelect: (id: string) => void;
-  lastByConv: Record<string, Message>;
+  lastByConv: Record<string, ChatMessage>;
+  unread: Record<string, number>;
+  myId: string | null;
   search: string;
   setSearch: (v: string) => void;
+  loading: boolean;
+  error: string | null;
 }) {
   return (
     <aside className="hidden md:flex w-[340px] flex-shrink-0 flex-col border-r border-[#222] bg-gray-1/40 backdrop-blur-md">
@@ -299,18 +335,28 @@ function ConvList({
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {conversations.length === 0 ? (
+        {loading ? (
           <div className="px-5 py-10 text-center text-[12px] text-gray-5">
-            No conversations.
+            Loading conversations…
+          </div>
+        ) : error ? (
+          <div className="px-5 py-10 text-center text-[12px] text-amber-light">
+            {error}
+          </div>
+        ) : conversations.length === 0 ? (
+          <div className="px-5 py-10 text-center text-[12px] text-gray-5">
+            No conversations yet. Match with crows to start chatting.
           </div>
         ) : (
           conversations.map((c) => (
             <ConvListRow
-              key={c.id}
+              key={c.matchId}
               conversation={c}
-              isSelected={c.id === selectedId}
-              lastMessage={lastByConv[c.id]}
-              onClick={() => onSelect(c.id)}
+              isSelected={c.matchId === selectedId}
+              lastMessage={lastByConv[c.matchId]}
+              unread={unread[c.matchId] ?? 0}
+              myId={myId}
+              onClick={() => onSelect(c.matchId)}
             />
           ))
         )}
@@ -323,16 +369,20 @@ function ConvListRow({
   conversation,
   isSelected,
   lastMessage,
+  unread,
+  myId,
   onClick,
 }: {
   conversation: Conversation;
   isSelected: boolean;
-  lastMessage?: Message;
+  lastMessage?: ChatMessage;
+  unread: number;
+  myId: string | null;
   onClick: () => void;
 }) {
   const accent = ACCENT_HEX[conversation.accent];
   const preview = lastMessage
-    ? (lastMessage.from === "me" ? "You: " : "") + lastMessage.text
+    ? (myId && lastMessage.senderId === myId ? "You: " : "") + lastMessage.message
     : "Say hi 👋";
 
   return (
@@ -357,12 +407,6 @@ function ConvListRow({
         }}
       >
         <span>{conversation.emoji}</span>
-        {conversation.online && (
-          <span
-            className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-ink"
-            style={{ background: "#6aab7a" }}
-          />
-        )}
       </div>
 
       <div className="flex-1 min-w-0">
@@ -371,25 +415,23 @@ function ConvListRow({
             {conversation.name}
           </span>
           <span className="text-[10px] text-gray-5 whitespace-nowrap flex-shrink-0">
-            {lastMessage?.time ?? ""}
+            {lastMessage ? formatTime(lastMessage.createdAt) : ""}
           </span>
         </div>
         <div className="flex items-center justify-between gap-2 mt-0.5">
           <p
             className={`text-[12px] truncate flex-1 ${
-              conversation.unread > 0 && !isSelected
-                ? "text-cream"
-                : "text-gray-5"
+              unread > 0 && !isSelected ? "text-cream" : "text-gray-5"
             }`}
           >
             {preview}
           </p>
-          {conversation.unread > 0 && !isSelected && (
+          {unread > 0 && !isSelected && (
             <span
               className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1.5 rounded-full text-[10px] font-bold text-ink flex-shrink-0"
               style={{ background: "#6aab7a" }}
             >
-              {conversation.unread}
+              {unread}
             </span>
           )}
         </div>
@@ -410,7 +452,7 @@ function ConvView({
   composerRef,
 }: {
   conversation: Conversation;
-  messages: Message[];
+  messages: ViewMessage[];
   composer: string;
   setComposer: (v: string) => void;
   onSend: () => void;
@@ -418,6 +460,9 @@ function ConvView({
   composerRef: React.RefObject<HTMLTextAreaElement | null>;
 }) {
   const accent = ACCENT_HEX[conversation.accent];
+  const subtitle = [conversation.role, conversation.company]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <section className="flex-1 min-w-0 flex flex-col bg-ink">
@@ -439,16 +484,14 @@ function ConvView({
           <div className="font-syne text-[15px] font-bold text-cream tracking-[-0.3px] leading-tight">
             {conversation.name}
           </div>
-          <div className="text-[11.5px] text-gray-5 leading-tight">
-            {conversation.role} at {conversation.company}
-            <span className="text-gray-4 mx-1.5">·</span>
-            <span className="text-cream font-medium">
-              {INTENT_BADGE[conversation.intent]}
-            </span>
-            {conversation.online && (
+          <div className="text-[11.5px] text-gray-5 leading-tight truncate">
+            {subtitle || "Matched on CrowHub"}
+            {conversation.intent && (
               <>
                 <span className="text-gray-4 mx-1.5">·</span>
-                <span style={{ color: ACCENT_HEX.sage }}>● Active now</span>
+                <span className="text-cream font-medium">
+                  {conversation.intent}
+                </span>
               </>
             )}
           </div>
@@ -551,9 +594,15 @@ function ConvView({
   );
 }
 
-function Thread({ messages, accent }: { messages: Message[]; accent: string }) {
+function Thread({
+  messages,
+  accent,
+}: {
+  messages: ViewMessage[];
+  accent: string;
+}) {
   // Group by day separator
-  const grouped: { day: string; items: Message[] }[] = [];
+  const grouped: { day: string; items: ViewMessage[] }[] = [];
   for (const m of messages) {
     const last = grouped[grouped.length - 1];
     if (last && last.day === m.day) last.items.push(m);
@@ -599,7 +648,7 @@ function Bubble({
   isFirstInRun,
   isLastInRun,
 }: {
-  message: Message;
+  message: ViewMessage;
   accent: string;
   isFirstInRun: boolean;
   isLastInRun: boolean;
@@ -618,9 +667,7 @@ function Bubble({
     >
       <div
         className={`max-w-[68%] px-4 py-2.5 text-[14px] leading-snug break-words ${
-          isMe
-            ? "text-ink"
-            : "text-cream border-[0.5px] border-white/10"
+          isMe ? "text-ink" : "text-cream border-[0.5px] border-white/10"
         }`}
         style={{
           background: isMe
@@ -636,9 +683,7 @@ function Bubble({
         {message.text}
       </div>
       {isLastInRun && (
-        <span className="text-[10px] text-gray-5 mt-1 px-1">
-          {message.time}
-        </span>
+        <span className="text-[10px] text-gray-5 mt-1 px-1">{message.time}</span>
       )}
     </div>
   );
@@ -669,15 +714,27 @@ function ChatEmpty({ conversation }: { conversation: Conversation }) {
   );
 }
 
-function EmptyConv() {
+function EmptyConv({
+  loading,
+  hasConversations,
+}: {
+  loading: boolean;
+  hasConversations: boolean;
+}) {
   return (
     <section className="flex-1 hidden md:flex flex-col items-center justify-center bg-ink text-center px-8">
       <div className="text-[48px] mb-4 inline-block animate-icon-glow">💬</div>
       <p className="font-syne text-[22px] text-cream font-extrabold mb-2 tracking-[-0.4px]">
-        Select a conversation
+        {loading
+          ? "Loading…"
+          : hasConversations
+            ? "Select a conversation"
+            : "No conversations yet"}
       </p>
       <p className="text-[13px] text-gray-5 max-w-[320px]">
-        Pick someone from the list to start chatting. Or go discover new crows.
+        {hasConversations
+          ? "Pick someone from the list to start chatting. Or go discover new crows."
+          : "Match with other crows to start a conversation."}
       </p>
     </section>
   );

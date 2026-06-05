@@ -7,7 +7,7 @@
  */
 
 const TOKEN_KEY = "crowhub:token";
-const BASE_URL =
+export const BASE_URL =
   (typeof process !== "undefined" && process.env.NEXT_PUBLIC_API_URL) ||
   "http://localhost:8080";
 
@@ -55,6 +55,8 @@ export type Profile = {
   location: string | null;
   personType: string | null;
   role: string | null;
+  company: string | null;
+  education: string | null;
   experience: number | null;
   experienceLevel: string | null;
   practiceYears: number | null;
@@ -158,6 +160,16 @@ export type CreateSwipeResult = {
   ismatch: boolean;
 };
 
+// A single chat message row, as persisted/broadcast by the backend.
+// Matches prisma model Chat and the `newMessage` socket payload exactly.
+export type ChatMessage = {
+  id: string;
+  matchId: string;
+  senderId: string;
+  message: string;
+  createdAt: string; // ISO 8601
+};
+
 export type ProfilePatch = Partial<{
   name: string;
   avatar: string;
@@ -167,6 +179,8 @@ export type ProfilePatch = Partial<{
   personType: string;
   domain: string;
   role: string;
+  company: string;
+  education: string;
   experience: number;
   practiceYears: number;
   skills: string[];
@@ -347,6 +361,17 @@ export const api = {
     },
     delete(matchId: string) {
       return request<{ match: string }>("DELETE", `/matches/${matchId}`);
+    },
+  },
+
+  chat: {
+    /** Full message history for a match, oldest first. */
+    history(matchId: string) {
+      return request<ChatMessage[]>("GET", `/chat/${encodeURIComponent(matchId)}`);
+    },
+    /** Clear all messages for a match. */
+    clear(matchId: string) {
+      return request<void>("DELETE", `/chat/message/${encodeURIComponent(matchId)}`);
     },
   },
 
