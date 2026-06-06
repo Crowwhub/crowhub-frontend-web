@@ -18,7 +18,14 @@ export default function Footer() {
         </span>
       </div>
       <div className="relative z-10 flex items-center justify-between flex-wrap gap-6">
-        <div className="font-syne text-base font-extrabold text-gray-4">
+        <div className="flex items-center gap-2 font-syne text-base font-extrabold text-gray-4">
+          <img
+            src="/crowhub_logo.png"
+            alt="CrowHub logo"
+            width={22}
+            height={22}
+            className="rounded-full"
+          />
           CrowHub
         </div>
         <ul className="flex gap-6 list-none">

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import CrowSvg from "@/components/CrowSvg";
 
 export default function AuthLayout({
   children,
@@ -36,17 +35,13 @@ export default function AuthLayout({
         href="/"
         className="absolute top-8 left-8 z-10 flex items-center gap-2"
       >
-        <div className="w-8 h-7 overflow-hidden flex items-center justify-center">
-          <CrowSvg
-            width={32}
-            height={28}
-            bodyFill="#f5f5f0"
-            wingFill="#aaaaaa"
-            detailFill="#888888"
-            accent="#6aab7a"
-            showPerch={false}
-          />
-        </div>
+        <img
+          src="/crowhub_logo.png"
+          alt="CrowHub logo"
+          width={30}
+          height={30}
+          className="rounded-full"
+        />
         <div className="font-syne font-extrabold text-[20px] tracking-[-0.5px] text-cream">
           Crow<span className="text-gray-5">Hub</span>
         </div>

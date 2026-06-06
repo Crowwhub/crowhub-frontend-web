@@ -94,8 +94,15 @@ export default function Nav() {
       <nav className="w-full max-w-[700px] flex items-center justify-between gap-6 px-5 py-2.5 rounded-2xl border-[0.5px] border-white/10 bg-white/[0.04] backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.06)]">
         <Link
           href="/"
-          className="font-syne font-extrabold text-[18px] tracking-[-0.5px] text-cream"
+          className="flex items-center gap-2 font-syne font-extrabold text-[18px] tracking-[-0.5px] text-cream"
         >
+          <img
+            src="/crowhub_logo.png"
+            alt="CrowHub logo"
+            width={28}
+            height={28}
+            className="rounded-full"
+          />
           Crow<span className="text-gray-5">Hub</span>
         </Link>
         <ul className="hidden md:flex gap-6 list-none">

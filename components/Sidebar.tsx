@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import CrowSvg from "./CrowSvg";
 import { api, setToken } from "@/lib/api";
 
 type Item = {
@@ -163,17 +162,13 @@ export default function Sidebar() {
         href="/"
         className="flex items-center gap-2.5 px-3 py-2 mb-7 group"
       >
-        <div className="w-5 h-5 flex items-center justify-center overflow-hidden">
-          <CrowSvg
-            width={22}
-            height={20}
-            bodyFill="#f5f5f0"
-            wingFill="#aaaaaa"
-            detailFill="#888888"
-            accent="#6aab7a"
-            showPerch={false}
-          />
-        </div>
+        <img
+          src="/crowhub_logo.png"
+          alt="CrowHub logo"
+          width={26}
+          height={26}
+          className="rounded-full"
+        />
         <div className="font-syne font-extrabold text-[22px] tracking-[-0.5px] text-cream">
           Crow<span className="text-gray-5">Hub</span>
         </div>
