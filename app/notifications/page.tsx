@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 
@@ -184,6 +184,14 @@ type TabId = (typeof TABS)[number]["id"];
 /* ============================================================ Page */
 
 export default function NotificationsPage() {
+  return (
+    <Suspense fallback={null}>
+      <NotificationsContent />
+    </Suspense>
+  );
+}
+
+function NotificationsContent() {
   const searchParams = useSearchParams();
   const initialTab =
     (searchParams?.get("tab") as TabId | null) &&
