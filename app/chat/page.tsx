@@ -86,7 +86,8 @@ export default function ChatPage() {
   const [myId, setMyId] = useState<string | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [unread, setUnread] = useState<Record<string, number>>({});
+  // Per-conversation last-read timestamps (epoch ms), seeded from the server.
+  const [lastRead, setLastRead] = useState<Record<string, number>>({});
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [composer, setComposer] = useState("");
   const [search, setSearch] = useState("");
@@ -97,6 +98,8 @@ export default function ChatPage() {
   const composerRef = useRef<HTMLTextAreaElement>(null);
   const selectedIdRef = useRef<string | null>(null);
   selectedIdRef.current = selectedId;
+  const messagesRef = useRef<ChatMessage[]>([]);
+  messagesRef.current = messages;
   const loadedHistory = useRef<Set<string>>(new Set());
 
   // Append a message, de-duping by id (history reloads + socket echoes overlap).
@@ -106,16 +109,38 @@ export default function ChatPage() {
     );
   }, []);
 
+  // Advance a conversation's read marker locally (monotonic).
+  const applyRead = useCallback((matchId: string, timeMs: number) => {
+    setLastRead((prev) =>
+      (prev[matchId] ?? 0) >= timeMs ? prev : { ...prev, [matchId]: timeMs }
+    );
+  }, []);
+
+  // Mark a conversation read (on open / new message in it): update locally and
+  // persist to the server so the read state syncs across devices.
+  const markRead = useCallback(
+    (matchId: string) => {
+      const latest = messagesRef.current.reduce(
+        (acc, m) =>
+          m.matchId === matchId ? Math.max(acc, +new Date(m.createdAt)) : acc,
+        Date.now()
+      );
+      applyRead(matchId, latest);
+      api.chat.markRead(matchId).catch(() => {});
+    },
+    [applyRead]
+  );
+
   // Live messages from the socket.
   const onSocketMessage = useCallback(
     (msg: ChatMessage) => {
       appendMessage(msg);
-      const isMine = !!myId && msg.senderId === myId;
-      if (!isMine && msg.matchId !== selectedIdRef.current) {
-        setUnread((u) => ({ ...u, [msg.matchId]: (u[msg.matchId] ?? 0) + 1 }));
+      // Keep the open thread marked read as new messages land in it.
+      if (msg.matchId === selectedIdRef.current) {
+        markRead(msg.matchId);
       }
     },
-    [appendMessage, myId]
+    [appendMessage, markRead]
   );
 
   const roomIds = useMemo(
@@ -127,37 +152,69 @@ export default function ChatPage() {
     onMessage: onSocketMessage,
   });
 
-  // Initial load: current user + conversations.
+  // Initial load: current user + conversations, then history for every
+  // conversation so unread counts and previews are correct on arrival.
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const [me, matches] = await Promise.all([
+        const [me, matches, reads] = await Promise.all([
           api.me.get(),
           api.matches.list(),
+          api.chat.reads().catch(() => [] as Awaited<ReturnType<typeof api.chat.reads>>),
         ]);
         if (cancelled) return;
         setMyId(me.id);
+        const readMap: Record<string, number> = {};
+        for (const r of reads) readMap[r.matchId] = +new Date(r.lastReadAt);
+        setLastRead(readMap);
         const convs = matches.map(toConversation);
         setConversations(convs);
-        // Select the conversation from ?with=<userId>, else the first.
+        // Nothing auto-opens. Only open a thread when arriving from a match's
+        // "Chat" button (?with=<userId>) — an explicit pick by the user.
         const fromParam = initialWith
           ? convs.find((c) => c.userId === initialWith)
           : undefined;
-        setSelectedId(fromParam?.matchId ?? convs[0]?.matchId ?? null);
+        setSelectedId(fromParam?.matchId ?? null);
         setLoadError(null);
-      } catch (err) {
-        if (!cancelled) {
-          if (err instanceof ApiError && err.status === 401) {
-            window.location.href = "/auth/login";
-            return;
-          }
-          setLoadError(
-            err instanceof ApiError ? err.message : "Couldn't load chats."
+        setLoading(false);
+
+        // Best-effort history fetch for all conversations (previews + unread).
+        // Bounded concurrency so we don't exhaust the backend DB connection
+        // pool when a user has many matches.
+        const CONCURRENCY = 5;
+        for (let i = 0; i < convs.length; i += CONCURRENCY) {
+          if (cancelled) return;
+          const batch = convs.slice(i, i + CONCURRENCY);
+          const results = await Promise.allSettled(
+            batch.map((c) => api.chat.history(c.matchId))
           );
+          if (cancelled) return;
+          const fresh: ChatMessage[] = [];
+          results.forEach((r, j) => {
+            if (r.status === "fulfilled") {
+              loadedHistory.current.add(batch[j].matchId);
+              fresh.push(...r.value);
+            }
+          });
+          if (fresh.length) {
+            setMessages((prev) => {
+              const seen = new Set(prev.map((m) => m.id));
+              const add = fresh.filter((m) => !seen.has(m.id));
+              return add.length ? [...prev, ...add] : prev;
+            });
+          }
         }
-      } finally {
-        if (!cancelled) setLoading(false);
+      } catch (err) {
+        if (cancelled) return;
+        if (err instanceof ApiError && err.status === 401) {
+          window.location.href = "/auth/login";
+          return;
+        }
+        setLoadError(
+          err instanceof ApiError ? err.message : "Couldn't load chats."
+        );
+        setLoading(false);
       }
     })();
     return () => {
@@ -165,10 +222,11 @@ export default function ChatPage() {
     };
   }, [initialWith]);
 
-  // Load history for a conversation the first time it's opened, clear its unread.
+  // On open: mark the conversation read, and load its history if the bulk
+  // fetch hasn't already (fallback for a failed/again-needed fetch).
   useEffect(() => {
     if (!selectedId) return;
-    setUnread((u) => (u[selectedId] ? { ...u, [selectedId]: 0 } : u));
+    markRead(selectedId);
     if (loadedHistory.current.has(selectedId)) return;
     loadedHistory.current.add(selectedId);
     let cancelled = false;
@@ -189,7 +247,7 @@ export default function ChatPage() {
     return () => {
       cancelled = true;
     };
-  }, [selectedId]);
+  }, [selectedId, markRead]);
 
   const convMessages = useMemo<ViewMessage[]>(() => {
     if (!selectedId) return [];
@@ -216,6 +274,20 @@ export default function ChatPage() {
     }
     return map;
   }, [messages]);
+
+  // Unread per conversation: messages from the other person newer than our
+  // last-read marker for that thread.
+  const unread = useMemo(() => {
+    const map: Record<string, number> = {};
+    if (!myId) return map;
+    for (const m of messages) {
+      if (m.senderId === myId) continue;
+      if (+new Date(m.createdAt) > (lastRead[m.matchId] ?? 0)) {
+        map[m.matchId] = (map[m.matchId] ?? 0) + 1;
+      }
+    }
+    return map;
+  }, [messages, lastRead, myId]);
 
   const orderedConvs = useMemo(() => {
     const stamp = (c: Conversation) =>
@@ -305,11 +377,20 @@ function ConvList({
   loading: boolean;
   error: string | null;
 }) {
+  const totalUnread = Object.values(unread).reduce((a, b) => a + b, 0);
   return (
     <aside className="hidden md:flex w-[340px] flex-shrink-0 flex-col border-r border-[#222] bg-gray-1/40 backdrop-blur-md">
       <div className="px-5 pt-7 pb-4">
-        <h2 className="font-syne text-[22px] font-extrabold tracking-[-0.5px] text-cream mb-3">
+        <h2 className="font-syne text-[22px] font-extrabold tracking-[-0.5px] text-cream mb-3 flex items-center gap-2">
           Messages
+          {totalUnread > 0 && (
+            <span
+              className="inline-flex items-center justify-center min-w-[20px] h-[20px] px-1.5 rounded-full text-[11px] font-bold text-ink"
+              style={{ background: "#6aab7a" }}
+            >
+              {totalUnread}
+            </span>
+          )}
         </h2>
         <div className="relative">
           <svg

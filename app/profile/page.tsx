@@ -17,7 +17,7 @@ type ProfileData = {
   location: string;
   type: ProfileType;
   company: string;
-  education: string;
+  college: string;
   experience: number;
   domain: string;
   intent: Intent;
@@ -37,7 +37,7 @@ const DEFAULT_PROFILE: ProfileData = {
   location: "",
   type: "professional",
   company: "",
-  education: "",
+  college: "",
   experience: 1,
   domain: "",
   intent: "networking",
@@ -280,7 +280,7 @@ export default function ProfilePage() {
           location: me.location ?? p.location,
           type: (me.personType ?? p.type) as ProfileData["type"],
           company: me.company ?? p.company,
-          education: me.education ?? p.education,
+          college: me.college ?? p.college,
           experience: me.experience ?? p.experience,
           domain: me.domain ?? p.domain,
           intent: (me.findMeFor?.[0] ?? p.intent) as ProfileData["intent"],
@@ -347,7 +347,7 @@ export default function ProfilePage() {
           ? (profile.type as "student" | "professional" | "freelancer")
           : undefined,
         company: profile.company || undefined,
-        education: profile.education || undefined,
+        college: profile.college || undefined,
         experience: profile.experience,
         domain: profile.domain || undefined,
         skills: profile.skills,
@@ -664,8 +664,8 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Field label="Education">
                   <TextInput
-                    value={profile.education}
-                    onChange={(v) => update("education", v)}
+                    value={profile.college}
+                    onChange={(v) => update("college", v)}
                     placeholder="e.g. B.Tech, IIT Bombay"
                   />
                 </Field>
@@ -964,8 +964,8 @@ function ProfilePreview({ profile }: { profile: ProfileData }) {
             {profile.role || "Add a role"}
             {profile.company ? ` · ${profile.company}` : ""}
           </div>
-          {profile.education && (
-            <div className="text-[12px] text-gray-5">🎓 {profile.education}</div>
+          {profile.college && (
+            <div className="text-[12px] text-gray-5">🎓 {profile.college}</div>
           )}
           <div className="text-[12px] text-gray-5">
             {profile.location || "Add a location"} ·{" "}

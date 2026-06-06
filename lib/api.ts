@@ -56,7 +56,7 @@ export type Profile = {
   personType: string | null;
   role: string | null;
   company: string | null;
-  education: string | null;
+  college: string | null;
   experience: number | null;
   experienceLevel: string | null;
   practiceYears: number | null;
@@ -170,6 +170,12 @@ export type ChatMessage = {
   createdAt: string; // ISO 8601
 };
 
+// Per-conversation read marker for the current user (server-persisted).
+export type ChatRead = {
+  matchId: string;
+  lastReadAt: string; // ISO 8601
+};
+
 export type ProfilePatch = Partial<{
   name: string;
   avatar: string;
@@ -180,7 +186,7 @@ export type ProfilePatch = Partial<{
   domain: string;
   role: string;
   company: string;
-  education: string;
+  college: string;
   experience: number;
   practiceYears: number;
   skills: string[];
@@ -372,6 +378,17 @@ export const api = {
     /** Clear all messages for a match. */
     clear(matchId: string) {
       return request<void>("DELETE", `/chat/message/${encodeURIComponent(matchId)}`);
+    },
+    /** The current user's read markers across all conversations. */
+    reads() {
+      return request<ChatRead[]>("GET", "/chat/reads");
+    },
+    /** Mark a conversation read up to now for the current user. */
+    markRead(matchId: string) {
+      return request<ChatRead>(
+        "POST",
+        `/chat/${encodeURIComponent(matchId)}/read`
+      );
     },
   },
 
