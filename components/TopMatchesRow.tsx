@@ -163,7 +163,7 @@ export default function TopMatchesRow({
               }}
               onProfile={() => {
                 setPeekId(null);
-                router.push("/profile");
+                router.push(`/matches?open=${peek.id}`);
               }}
             />
           </div>

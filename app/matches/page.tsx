@@ -84,8 +84,20 @@ export default function MatchesPage() {
       try {
         const data = await api.matches.list();
         if (!cancelled) {
-          setMatches(data.map(toMatch));
+          const mapped = data.map(toMatch);
+          setMatches(mapped);
           setLoadError(null);
+          // Auto-open a match's profile when arriving via /matches?open=<userId>
+          // (e.g. "View Profile" from the home top-matches row).
+          try {
+            const openId = new URLSearchParams(window.location.search).get(
+              "open",
+            );
+            if (openId) {
+              const found = mapped.find((m) => m.id === openId);
+              if (found) setOpenMatch(found);
+            }
+          } catch {}
         }
       } catch (err) {
         if (!cancelled) {
