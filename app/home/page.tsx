@@ -348,9 +348,9 @@ const PROFILES: Profile[] = [
 const INTENTS = [
   // Universal — folded-in former purpose values
   "Networking",
+  "Project Collaboration",
   "Hiring",
   "Referral",
-  "Project Collab",
   // Universal — original findMeFor
   "Co-founder",
   "Mentor",
