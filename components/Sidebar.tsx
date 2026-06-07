@@ -21,7 +21,13 @@ export default function Sidebar() {
   const [avatar, setAvatar] = useState("🐦‍⬛");
   const [pendingRequests, setPendingRequests] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close the mobile drawer whenever the route changes.
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   // Load identity
   useEffect(() => {
@@ -130,7 +136,62 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="hidden md:flex fixed left-0 top-0 h-screen w-[260px] flex-col py-6 px-3 border-r border-[#1a1a1a] bg-ink z-30">
+    <>
+      {/* Mobile hamburger (hidden on md+) */}
+      <button
+        type="button"
+        onClick={() => setMobileOpen(true)}
+        aria-label="Open menu"
+        className="md:hidden fixed top-4 left-4 z-30 w-10 h-10 rounded-xl flex items-center justify-center border-[0.5px] border-white/10 bg-gray-1/70 backdrop-blur-md text-cream shadow-[0_4px_14px_rgba(0,0,0,0.4)]"
+      >
+        <svg
+          className="w-5 h-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.8}
+          strokeLinecap="round"
+        >
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-30 bg-black/50 backdrop-blur-sm"
+          onClick={() => setMobileOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      <aside
+        className={`fixed left-0 top-0 h-screen w-[260px] flex flex-col py-6 px-3 border-r border-[#1a1a1a] bg-ink z-40 transition-transform duration-300 ease-out md:translate-x-0 ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* Mobile close button */}
+        <button
+          type="button"
+          onClick={() => setMobileOpen(false)}
+          aria-label="Close menu"
+          className="md:hidden absolute top-4 right-3 w-9 h-9 rounded-xl flex items-center justify-center text-gray-5 hover:text-cream hover:bg-white/[0.05] transition-colors"
+        >
+          <svg
+            className="w-5 h-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.8}
+            strokeLinecap="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+
       {/* Logo */}
       <Link
         href="/"
@@ -151,7 +212,12 @@ export default function Sidebar() {
       {/* Top nav */}
       <nav className="flex flex-col gap-2">
         {topNav.map((item) => (
-          <Row key={item.id} item={item} active={isActive(item)} />
+          <Row
+            key={item.id}
+            item={item}
+            active={isActive(item)}
+            onNavigate={() => setMobileOpen(false)}
+          />
         ))}
       </nav>
 
@@ -161,7 +227,12 @@ export default function Sidebar() {
       {/* Bottom nav */}
       <nav className="flex flex-col gap-2">
         {bottomNav.map((item) => (
-          <Row key={item.id} item={item} active={isActive(item)} />
+          <Row
+            key={item.id}
+            item={item}
+            active={isActive(item)}
+            onNavigate={() => setMobileOpen(false)}
+          />
         ))}
       </nav>
 
@@ -224,12 +295,21 @@ export default function Sidebar() {
         </button>
       </div>
     </aside>
+    </>
   );
 }
 
 /* ============================================================ Row */
 
-function Row({ item, active }: { item: Item; active: boolean }) {
+function Row({
+  item,
+  active,
+  onNavigate,
+}: {
+  item: Item;
+  active: boolean;
+  onNavigate?: () => void;
+}) {
   const baseClass =
     "group relative flex items-center gap-2.5 h-[48px] px-3 rounded-2xl transition-all duration-150 outline-none";
   const activeClass =
@@ -268,13 +348,20 @@ function Row({ item, active }: { item: Item; active: boolean }) {
 
   if (item.href) {
     return (
-      <Link href={item.href} className={cls}>
+      <Link href={item.href} className={cls} onClick={onNavigate}>
         {content}
       </Link>
     );
   }
   return (
-    <button type="button" onClick={item.onClick} className={cls}>
+    <button
+      type="button"
+      onClick={() => {
+        item.onClick?.();
+        onNavigate?.();
+      }}
+      className={cls}
+    >
       {content}
     </button>
   );
