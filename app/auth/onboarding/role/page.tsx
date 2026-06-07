@@ -41,6 +41,9 @@ const domains = [
   { value: "educator", label: "Educator" },
   { value: "researcher", label: "Researcher" },
   { value: "entrepreneur", label: "Entrepreneur" },
+  { value: "lawyer", label: "Lawyer" },
+  { value: "doctor", label: "Doctor" },
+  { value: "architect", label: "Architect" },
 ];
 
 export default function RolePage() {

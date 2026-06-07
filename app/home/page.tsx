@@ -465,6 +465,9 @@ const DOMAINS = [
   "Marketing Professional",
   "Educator",
   "Researcher",
+  "Lawyer",
+  "Doctor",
+  "Architect",
   "Entrepreneur",
 ].map((s) => ({ value: s, label: s }));
 

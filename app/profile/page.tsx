@@ -178,6 +178,9 @@ const DOMAIN_OPTIONS = [
   { value: "Artist", label: "Artist" },
   { value: "Filmmaker", label: "Filmmaker" },
   { value: "Entrepreneur", label: "Entrepreneur" },
+  { value: "Lawyer", label: "Lawyer" },
+  { value: "Doctor", label: "Doctor" },
+  { value: "Architect", label: "Architect" },
   { value: "Other", label: "Other" },
 ];
 
