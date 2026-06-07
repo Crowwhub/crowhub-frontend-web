@@ -19,7 +19,6 @@ export default function Sidebar() {
   const pathname = usePathname() ?? "";
   const [name, setName] = useState("Subham");
   const [avatar, setAvatar] = useState("🐦‍⬛");
-  const [unread, setUnread] = useState(0);
   const [pendingRequests, setPendingRequests] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -53,25 +52,6 @@ export default function Sidebar() {
     };
   }, []);
 
-  // Subscribe to notification badge
-  useEffect(() => {
-    function refresh() {
-      try {
-        const raw = localStorage.getItem("crowhub:notifications:unread");
-        const n = raw === null ? NaN : Number(raw);
-        setUnread(Number.isFinite(n) && n > 0 ? n : 0);
-      } catch {
-        setUnread(0);
-      }
-    }
-    refresh();
-    window.addEventListener("crowhub:notifications-changed", refresh);
-    window.addEventListener("storage", refresh);
-    return () => {
-      window.removeEventListener("crowhub:notifications-changed", refresh);
-      window.removeEventListener("storage", refresh);
-    };
-  }, []);
 
   // Click outside for the bottom menu
   useEffect(() => {
@@ -104,7 +84,6 @@ export default function Sidebar() {
       label: "Notifications",
       icon: (a) => <BellIcon active={a} />,
       href: "/notifications",
-      badge: unread,
     },
     {
       id: "requests",
@@ -127,11 +106,6 @@ export default function Sidebar() {
       label: "Profile",
       icon: (a) => <UserIcon active={a} />,
       href: "/profile",
-    },
-    {
-      id: "settings",
-      label: "Settings",
-      icon: (a) => <SettingsIcon active={a} />,
     },
   ];
 
@@ -444,23 +418,6 @@ function UserIcon({ active }: { active: boolean }) {
     <svg {...p}>
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
       <circle cx="12" cy="7" r="4" />
-    </svg>
-  );
-}
-
-function SettingsIcon({ active }: { active: boolean }) {
-  const p = iconProps(active);
-  return (
-    <svg {...p}>
-      <circle cx="12" cy="12" r="3" />
-      <path d="M12 1v3" />
-      <path d="M12 20v3" />
-      <path d="M4.22 4.22l2.12 2.12" />
-      <path d="M17.66 17.66l2.12 2.12" />
-      <path d="M1 12h3" />
-      <path d="M20 12h3" />
-      <path d="M4.22 19.78l2.12-2.12" />
-      <path d="M17.66 6.34l2.12-2.12" />
     </svg>
   );
 }
