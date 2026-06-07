@@ -7,7 +7,7 @@ export default function Hero() {
       <div className="min-w-0 overflow-hidden">
         <div className="inline-flex items-center gap-2 bg-gray-2 border-[0.5px] border-gray-3 rounded-full px-[14px] py-[6px] text-[11px] text-gray-5 tracking-[0.14em] uppercase mb-6">
           <div className="w-[6px] h-[6px] bg-gray-5 rounded-full animate-pulse-dot" />
-          Now in open beta
+          Intent-first people discovery
         </div>
         <h1
           className="font-syne font-extrabold text-cream mb-6"
@@ -17,15 +17,14 @@ export default function Hero() {
             letterSpacing: "-2px",
           }}
         >
-          Connect
+          Find Your
           <br />
-          <span className="text-[#555]">Beyond</span>
-          <br />
-          Boundaries
+          <span className="text-[#555]">People.</span>
         </h1>
-        <p className="text-[15px] text-gray-5 leading-[1.6] max-w-[400px] mb-5 font-light">
-          CrowHub brings real people together. Build your network, follow
-          creators, and discover communities that matter to you.
+        <p className="text-[15px] text-gray-5 leading-[1.6] max-w-[440px] mb-5 font-light">
+          CrowHub is an intent-first people discovery platform where
+          connections start with purpose, not randomness. Discover people based
+          on shared goals, interests, and intent.
         </p>
         <div className="flex items-center gap-3 flex-wrap">
           <Link
