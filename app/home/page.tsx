@@ -1,12 +1,19 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import GlassSelect from "@/components/GlassSelect";
 import Sidebar from "@/components/Sidebar";
 import TopMatchesRow, {
   type TopMatchProfile,
+  type TopMatchIntent,
 } from "@/components/TopMatchesRow";
-import { api, ApiError, type CrowResult, type Intent } from "@/lib/api";
+import {
+  api,
+  ApiError,
+  type CrowResult,
+  type Intent,
+  type ConfigMatch,
+} from "@/lib/api";
 import { useProfileLikes } from "@/lib/useProfileLikes";
 
 type ProfileType = "student" | "professional" | "freelancer";
@@ -572,6 +579,31 @@ const TYPE_LABEL: Record<ProfileType, string> = {
 
 };
 
+const TOP_MATCH_INTENTS: TopMatchIntent[] = [
+  "networking",
+  "hiring",
+  "referral",
+  "mentorship",
+];
+
+// Map a real match (from /config) to the TopMatchesRow shape.
+function configMatchToTop(m: ConfigMatch): TopMatchProfile {
+  const lc = (m.intent ?? "").toLowerCase();
+  const intent = (TOP_MATCH_INTENTS as string[]).includes(lc)
+    ? (lc as TopMatchIntent)
+    : "networking";
+  return {
+    id: m.user.id,
+    name: m.user.name ?? m.user.username,
+    emoji: m.user.avatar ?? "🐦‍⬛",
+    role: m.user.role ?? "",
+    company: m.user.location ?? "",
+    intent,
+    online: false,
+    mutuals: 0,
+  };
+}
+
 export default function HomePage() {
   const [name, setName] = useState("there");
   const [intent, setIntent] = useState("");
@@ -591,6 +623,11 @@ export default function HomePage() {
   const [results, setResults] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [topMatches, setTopMatches] = useState<TopMatchProfile[]>([]);
+  const [matchCount, setMatchCount] = useState(0);
+  const [streak, setStreak] = useState<{ count: number; active: boolean } | null>(
+    null,
+  );
   const dragStartRef = useRef<number | null>(null);
   const dragCapturedRef = useRef(false);
   const DRAG_THRESHOLD = 6;
@@ -618,22 +655,23 @@ export default function HomePage() {
     } catch {}
   }, []);
 
-  const topMatches = useMemo<TopMatchProfile[]>(() => {
-    const pool = [...PROFILES].sort((a, b) => b.experience - a.experience);
-    return pool.slice(0, 9).map((p, i) => ({
-      id: p.id,
-      name: p.name,
-      emoji: p.emoji,
-      role: p.role,
-      company: p.location,
-      intent: ((["networking", "hiring", "referral", "mentorship"] as const).includes(
-        p.intent as "networking" | "hiring" | "referral" | "mentorship",
-      )
-        ? (p.intent as "networking" | "hiring" | "referral" | "mentorship")
-        : "networking") as TopMatchProfile["intent"],
-      online: i === 0 || i === 2 || i === 4 || i === 5,
-      mutuals: 2 + ((i * 7) % 11),
-    }));
+  // Real top matches + swipe streak from the backend config endpoint.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const config = await api.config.get();
+        if (cancelled) return;
+        setTopMatches(config.matches.top.map(configMatchToTop));
+        setMatchCount(config.matches.count);
+        setStreak(config.streak);
+      } catch {
+        // Unauthenticated or backend down — leave the section empty.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const ready = !!intent && !!domain;
@@ -791,9 +829,32 @@ export default function HomePage() {
               <h1 className="font-syne text-[36px] font-extrabold tracking-[-1.4px] text-cream leading-none">
                 Hey {name} <span className="inline-block">👋</span>
               </h1>
+              {streak && (
+                <div className="mt-3 inline-flex items-center gap-1.5 rounded-full border-[0.5px] border-white/15 bg-white/[0.05] backdrop-blur-md px-3 py-1.5 text-[12px]">
+                  <span aria-hidden="true">🔥</span>
+                  {streak.count > 0 ? (
+                    <span className="text-cream font-medium">
+                      {streak.count} day streak
+                      {!streak.active && (
+                        <span className="text-gray-5 font-normal">
+                          {" "}· swipe today to keep it
+                        </span>
+                      )}
+                    </span>
+                  ) : (
+                    <span className="text-gray-5">
+                      Swipe today to start a streak
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
 
-            <TopMatchesRow you={{ name, avatar }} matches={topMatches} />
+            <TopMatchesRow
+              you={{ name, avatar }}
+              matches={topMatches}
+              total={matchCount}
+            />
 
             <div className="mt-10">
               <FiltersPanel

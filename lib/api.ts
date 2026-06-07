@@ -176,6 +176,18 @@ export type ChatRead = {
   lastReadAt: string; // ISO 8601
 };
 
+// Home bootstrap config: GET /config
+export type ConfigMatch = {
+  matchId: string;
+  intent: string | null;
+  user: PublicUser;
+};
+
+export type HomeConfig = {
+  streak: { count: number; active: boolean };
+  matches: { count: number; top: ConfigMatch[] };
+};
+
 export type ProfilePatch = Partial<{
   name: string;
   avatar: string;
@@ -358,6 +370,13 @@ export const api = {
     },
     requests() {
       return request<SwipeRequest[]>("GET", "/swipes/requests");
+    },
+  },
+
+  config: {
+    /** Home bootstrap: swipe streak + the user's matches (with total count). */
+    get() {
+      return request<HomeConfig>("GET", "/config");
     },
   },
 

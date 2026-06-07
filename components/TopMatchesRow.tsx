@@ -59,10 +59,12 @@ const RING: Record<
 export default function TopMatchesRow({
   you,
   matches,
+  total,
   onSeeAll,
 }: {
   you: YouProfile;
   matches: TopMatchProfile[];
+  total?: number;
   onSeeAll?: () => void;
 }) {
   const router = useRouter();
@@ -81,6 +83,9 @@ export default function TopMatchesRow({
       <div className="flex items-center justify-between mb-3 px-1">
         <span className="text-[10px] uppercase tracking-[0.18em] text-gray-5">
           Your top matches
+          {typeof total === "number" && total > 0 && (
+            <span className="ml-2 text-cream">({total})</span>
+          )}
         </span>
         {onSeeAll && (
           <button
@@ -112,23 +117,29 @@ export default function TopMatchesRow({
         <div className="no-scrollbar overflow-x-auto pb-2">
           <div className="flex gap-5 px-2 pt-2 w-max">
             <YouCircle you={you} />
-            {loaded
-              ? matches.map((m) => (
-                  <MatchCircle
-                    key={m.id}
-                    match={m}
-                    selected={peekId === m.id}
-                    onClick={() =>
-                      setPeekId((prev) => (prev === m.id ? null : m.id))
-                    }
-                  />
-                ))
-              : Array.from({ length: 3 }).map((_, i) => (
+            {!loaded ? (
+              <>
+                {Array.from({ length: 3 }).map((_, i) => (
                   <SkeletonCircle key={i} delay={i * 0.15} />
                 ))}
-            {!loaded && (
-              <div className="self-center pl-2 text-[11px] uppercase tracking-[0.14em] text-gray-5">
-                Finding your flock…
+                <div className="self-center pl-2 text-[11px] uppercase tracking-[0.14em] text-gray-5">
+                  Finding your flock…
+                </div>
+              </>
+            ) : matches.length > 0 ? (
+              matches.map((m) => (
+                <MatchCircle
+                  key={m.id}
+                  match={m}
+                  selected={peekId === m.id}
+                  onClick={() =>
+                    setPeekId((prev) => (prev === m.id ? null : m.id))
+                  }
+                />
+              ))
+            ) : (
+              <div className="self-center pl-2 text-[12px] text-gray-5">
+                No matches yet — start swiping to find your flock.
               </div>
             )}
           </div>
