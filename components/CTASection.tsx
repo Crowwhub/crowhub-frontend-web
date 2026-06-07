@@ -9,8 +9,8 @@ export default function CTASection() {
             "conic-gradient(from 0deg, rgba(255,255,255,0.04), rgba(255,255,255,0.22), rgba(255,255,255,0.04), rgba(255,255,255,0.18), rgba(255,255,255,0.04), rgba(255,255,255,0.22), rgba(255,255,255,0.04))",
         }}
       />
-      <div className="relative bg-gray-1 rounded-3xl px-12 py-20 text-center">
-        <h2 className="font-syne text-[44px] md:text-[56px] font-extrabold tracking-[-2px] leading-[1.04] mb-4">
+      <div className="relative bg-gray-1 rounded-3xl px-6 sm:px-12 py-16 sm:py-20 text-center">
+        <h2 className="font-syne text-[34px] sm:text-[44px] md:text-[56px] font-extrabold tracking-[-2px] leading-[1.04] mb-4">
           Ready to join
           <br />
           the flock?
@@ -18,7 +18,7 @@ export default function CTASection() {
         <p className="text-[15px] text-gray-5 mb-8">
           Be among the first. No spam, no noise — just the right people.
         </p>
-        <form className="flex gap-2 max-w-[440px] mx-auto">
+        <form className="flex flex-col sm:flex-row gap-2 max-w-[440px] mx-auto">
           <input
             type="email"
             placeholder="your@email.com"

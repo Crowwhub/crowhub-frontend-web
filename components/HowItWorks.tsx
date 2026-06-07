@@ -25,7 +25,7 @@ const showcase = [
 
 export default function HowItWorks() {
   return (
-    <section className="grid grid-cols-1 md:grid-cols-2 gap-20 items-center mb-20">
+    <section className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center mb-20">
       <div>
         <div className="text-[11px] tracking-[0.14em] uppercase text-gray-5 mb-4">
           How it works
@@ -62,7 +62,7 @@ export default function HowItWorks() {
       </div>
 
       <div className="bg-gray-2 border-[0.5px] border-gray-3 rounded-3xl p-6">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {showcase.map((p) => (
             <div
               key={p.initials}

@@ -43,22 +43,22 @@ export default function Page() {
       </div>
       <Ticker variant="outer" />
       <Nav />
-      <div className="max-w-[1100px] mx-auto px-8">
+      <div className="max-w-[1100px] mx-auto px-5 sm:px-8">
         <Hero />
       </div>
       <Ticker variant="inner" />
-      <div className="max-w-[1100px] mx-auto px-8 py-24">
+      <div className="max-w-[1100px] mx-auto px-5 sm:px-8 py-16 sm:py-24">
         <Features />
       </div>
       <SectionRule />
-      <div className="max-w-[1100px] mx-auto px-8 py-24">
+      <div className="max-w-[1100px] mx-auto px-5 sm:px-8 py-16 sm:py-24">
         <HowItWorks />
       </div>
       <SectionRule />
-      <div className="max-w-[1100px] mx-auto px-8 py-24">
+      <div className="max-w-[1100px] mx-auto px-5 sm:px-8 py-16 sm:py-24">
         <CTASection />
       </div>
-      <div className="max-w-[1100px] mx-auto px-8">
+      <div className="max-w-[1100px] mx-auto px-5 sm:px-8">
         <Footer />
       </div>
     </>
