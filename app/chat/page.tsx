@@ -104,6 +104,7 @@ function ChatPageContent() {
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const composerRef = useRef<HTMLTextAreaElement>(null);
   const selectedIdRef = useRef<string | null>(null);
   selectedIdRef.current = selectedId;
@@ -315,7 +316,14 @@ function ChatPageContent() {
   const selected = conversations.find((c) => c.matchId === selectedId) ?? null;
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = messagesContainerRef.current;
+    if (!el) return;
+    // Pin to the bottom. scrollIntoView is unreliable on mobile (it can scroll
+    // the wrong element or get interrupted by the keyboard) — set scrollTop
+    // directly, deferred to after the new message has painted.
+    requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+    });
   }, [convMessages.length, selectedId]);
 
   function sendMessage() {
@@ -352,6 +360,7 @@ function ChatPageContent() {
             onSend={sendMessage}
             onBack={() => setSelectedId(null)}
             messagesEndRef={messagesEndRef}
+            messagesContainerRef={messagesContainerRef}
             composerRef={composerRef}
           />
         ) : (
@@ -545,6 +554,7 @@ function ConvView({
   onSend,
   onBack,
   messagesEndRef,
+  messagesContainerRef,
   composerRef,
 }: {
   conversation: Conversation;
@@ -554,6 +564,7 @@ function ConvView({
   onSend: () => void;
   onBack: () => void;
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
+  messagesContainerRef: React.RefObject<HTMLDivElement | null>;
   composerRef: React.RefObject<HTMLTextAreaElement | null>;
 }) {
   const accent = ACCENT_HEX[conversation.accent];
@@ -632,7 +643,7 @@ function ConvView({
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-6">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-6 py-6">
         {messages.length === 0 ? (
           <ChatEmpty conversation={conversation} />
         ) : (
