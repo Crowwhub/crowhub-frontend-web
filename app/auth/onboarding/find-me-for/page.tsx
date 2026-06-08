@@ -102,6 +102,8 @@ const UNIVERSAL_TAGS: Tag[] = [
   { label: "Hire me", emoji: "💼" },
   { label: "Referral", emoji: "🎯" },
   { label: "Project Collab", emoji: "🧩" },
+  { label: "Leetcode partner", emoji: "🧩" },
+  { label: "Tech interview prep", emoji: "💼" },
   { label: "Co-founder", emoji: "🚀" },
   { label: "Mentor", emoji: "🧭" },
   { label: "Mentee", emoji: "🌱" },
@@ -114,9 +116,7 @@ const UNIVERSAL_TAGS: Tag[] = [
   { label: "Matiks squad", emoji: "🔢" },
   { label: "Chess opponent", emoji: "♟️" },
   { label: "Reading group", emoji: "📖" },
-  { label: "Leetcode partner", emoji: "🧩" },
   { label: "Career guidance", emoji: "🧭" },
-  { label: "Tech interview prep", emoji: "💼" },
   { label: "Just to chat", emoji: "💬" },
 ];
 
