@@ -329,7 +329,7 @@ function ChatPageContent() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-ink">
       <Sidebar />
-      <main className="md:pl-[260px] h-screen flex">
+      <main className="md:pl-[260px] h-[100dvh] flex">
         <ConvList
           conversations={filteredConvs}
           selectedId={selectedId}

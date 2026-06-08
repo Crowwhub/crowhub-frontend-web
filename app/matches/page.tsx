@@ -376,8 +376,9 @@ function MatchProfileModal({
       role="dialog"
       aria-modal="true"
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/80 backdrop-blur-sm p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 overflow-y-auto bg-ink/80 backdrop-blur-sm"
     >
+      <div className="flex min-h-full items-center justify-center p-4">
       <div
         onClick={(e) => e.stopPropagation()}
         className="relative w-full max-w-[440px] my-8 rounded-3xl border-[0.5px] border-white/15 bg-gradient-to-b from-gray-1/95 to-gray-2/95 backdrop-blur-xl shadow-[0_30px_80px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.06)]"
@@ -501,6 +502,7 @@ function MatchProfileModal({
             Open chat →
           </button>
         </div>
+      </div>
       </div>
     </div>
   );
