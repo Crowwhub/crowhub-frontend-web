@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import "driver.js/dist/driver.css";
 import GlassSelect from "@/components/GlassSelect";
 import Sidebar from "@/components/Sidebar";
 import TopMatchesRow, {
@@ -677,6 +678,80 @@ export default function HomePage() {
     };
   }, []);
 
+  // Guided product tour for new users (driver.js). Anchored to the matches
+  // row, intent/domain selects, advanced filters, and the find button.
+  const startTour = useCallback(async () => {
+    const { driver } = await import("driver.js");
+    driver({
+      showProgress: true,
+      popoverClass: "crow-tour",
+      nextBtnText: "Next →",
+      prevBtnText: "← Back",
+      doneBtnText: "Got it 🎉",
+      steps: [
+        {
+          element: '[data-tour="matches"]',
+          popover: {
+            title: "Your matches",
+            description:
+              "People you and someone both said yes to show up here. Tap a circle to peek at their profile or jump into chat.",
+          },
+        },
+        {
+          element: '[data-tour="intent"]',
+          popover: {
+            title: "Pick your intent",
+            description:
+              "Tell CrowHub why you're here — networking, project collaboration, hiring, mentorship and more.",
+          },
+        },
+        {
+          element: '[data-tour="domain"]',
+          popover: {
+            title: "Choose a domain",
+            description:
+              "The field you want to connect in — e.g. Software Developer, Designer, Doctor, Lawyer.",
+          },
+        },
+        {
+          element: '[data-tour="advanced"]',
+          popover: {
+            title: "Fine-tune it",
+            description:
+              "Open Advanced filters to narrow by location, skills, goals and person type.",
+          },
+        },
+        {
+          element: '[data-tour="find"]',
+          popover: {
+            title: "Find & swipe",
+            description:
+              "Hit Find crows, then swipe right to connect and left to pass. That's it — enjoy! 🐦‍⬛",
+          },
+        },
+      ],
+    }).drive();
+  }, []);
+
+  // Auto-run the tour once for first-time visitors.
+  useEffect(() => {
+    let cancelled = false;
+    try {
+      if (localStorage.getItem("crowhub:home-tour-v1")) return;
+    } catch {}
+    const t = window.setTimeout(() => {
+      if (cancelled) return;
+      void startTour();
+      try {
+        localStorage.setItem("crowhub:home-tour-v1", "1");
+      } catch {}
+    }, 800);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(t);
+    };
+  }, [startTour]);
+
   const ready = !!intent && !!domain;
   const showEmpty = !ready;
 
@@ -851,13 +926,22 @@ export default function HomePage() {
                   )}
                 </div>
               )}
+              <button
+                type="button"
+                onClick={() => void startTour()}
+                className="mt-3 ml-2 inline-flex items-center gap-1 text-[12px] text-gray-5 hover:text-cream transition-colors"
+              >
+                Take a tour ↗
+              </button>
             </div>
 
-            <TopMatchesRow
-              you={{ name, avatar }}
-              matches={topMatches}
-              total={matchCount}
-            />
+            <div data-tour="matches">
+              <TopMatchesRow
+                you={{ name, avatar }}
+                matches={topMatches}
+                total={matchCount}
+              />
+            </div>
 
             <div className="mt-10">
               <FiltersPanel
@@ -1086,33 +1170,38 @@ function FiltersPanel({
   return (
     <div className="flex flex-col gap-4 p-5 rounded-2xl border-[0.5px] border-white/10 bg-gray-1/40 backdrop-blur-md">
       <div className="flex flex-col sm:flex-row sm:items-end gap-3">
-        <Field label="Intent" className="flex-1 min-w-0">
-          <GlassSelect
-            value={intent}
-            onChange={setIntent}
-            options={INTENTS}
-            placeholder="Why are you here?"
-            searchable
-            searchPlaceholder="Search intents…"
-          />
-        </Field>
+        <div data-tour="intent" className="flex-1 min-w-0">
+          <Field label="Intent">
+            <GlassSelect
+              value={intent}
+              onChange={setIntent}
+              options={INTENTS}
+              placeholder="Why are you here?"
+              searchable
+              searchPlaceholder="Search intents…"
+            />
+          </Field>
+        </div>
 
-        <Field label="Domain" className="flex-1 min-w-0">
-          <GlassSelect
-            value={domain}
-            onChange={setDomain}
-            options={DOMAINS}
-            placeholder="Pick a field"
-            searchable
-            searchPlaceholder="Search domains…"
-            allowCustom
-          />
-        </Field>
+        <div data-tour="domain" className="flex-1 min-w-0">
+          <Field label="Domain">
+            <GlassSelect
+              value={domain}
+              onChange={setDomain}
+              options={DOMAINS}
+              placeholder="Pick a field"
+              searchable
+              searchPlaceholder="Search domains…"
+              allowCustom
+            />
+          </Field>
+        </div>
 
         <div className="flex flex-col gap-2 shrink-0">
           {HiddenLabel}
           <button
             type="button"
+            data-tour="advanced"
             onClick={() => setShowMore(!showMore)}
             aria-pressed={showMore}
             className={`inline-flex items-center gap-2 px-4 h-[44px] rounded-full text-[12px] border-[0.5px] cursor-pointer transition-colors ${
@@ -1147,6 +1236,7 @@ function FiltersPanel({
           {HiddenLabel}
           <button
             type="button"
+            data-tour="find"
             onClick={onFindCrows}
             disabled={!ready}
             className="inline-flex items-center justify-center gap-2 px-5 h-[44px] rounded-full text-[13px] font-medium cursor-pointer text-cream border-[0.5px] border-white/30 bg-gradient-to-b from-white/25 to-white/10 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_4px_14px_rgba(0,0,0,0.3)] transition-all duration-150 hover:from-white/35 hover:to-white/15 hover:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:from-white/25 disabled:hover:to-white/10 disabled:hover:scale-100 disabled:bg-gradient-to-b"
