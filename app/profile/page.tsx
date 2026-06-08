@@ -7,7 +7,16 @@ import { ApiError, api } from "@/lib/api";
 
 /* ============================================================ Types & data */
 
-type ProfileType = "" | "student" | "professional" | "freelancer";
+type ProfileType =
+  | ""
+  | "student"
+  | "professional"
+  | "freelancer"
+  | "founder"
+  | "recruiter"
+  | "investor"
+  | "explorer"
+  | "aspirant";
 type Intent = "" | "networking" | "hiring" | "referral" | "mentorship";
 
 type ProfileData = {
@@ -18,6 +27,7 @@ type ProfileData = {
   type: ProfileType;
   company: string;
   college: string;
+  aspirantOf: string;
   experience: number;
   domain: string;
   intent: Intent;
@@ -38,6 +48,7 @@ const DEFAULT_PROFILE: ProfileData = {
   type: "professional",
   company: "",
   college: "",
+  aspirantOf: "",
   experience: 1,
   domain: "",
   intent: "networking",
@@ -164,7 +175,30 @@ const TYPE_OPTIONS = [
   { value: "student", label: "Student" },
   { value: "professional", label: "Working Professional" },
   { value: "freelancer", label: "Freelancer" },
+  { value: "founder", label: "Founder" },
+  { value: "recruiter", label: "Recruiter" },
+  { value: "investor", label: "Investor" },
+  { value: "explorer", label: "Explorer" },
+  { value: "aspirant", label: "Aspirant" },
 ];
+
+// Common exams/goals an Aspirant might be preparing for (free-text allowed too).
+const ASPIRANT_OPTIONS = [
+  "UPSC",
+  "GATE",
+  "NEET PG",
+  "NEET UG",
+  "JEE",
+  "CAT",
+  "GRE",
+  "GMAT",
+  "CA",
+  "CFA",
+  "UGC NET",
+  "SSC",
+  "Banking",
+  "CLAT",
+].map((s) => ({ value: s, label: s }));
 
 const DOMAIN_OPTIONS = [
   { value: "Software Developer", label: "Software Developer" },
@@ -232,6 +266,11 @@ const TYPE_LABEL: Record<Exclude<ProfileType, "">, string> = {
   student: "Student",
   professional: "Professional",
   freelancer: "Freelancer",
+  founder: "Founder",
+  recruiter: "Recruiter",
+  investor: "Investor",
+  explorer: "Explorer",
+  aspirant: "Aspirant",
 };
 
 /* ============================================================ Page */
@@ -284,6 +323,7 @@ export default function ProfilePage() {
           type: (me.personType ?? p.type) as ProfileData["type"],
           company: me.company ?? p.company,
           college: me.college ?? p.college,
+          aspirantOf: me.aspirantOf ?? p.aspirantOf,
           experience: me.experience ?? p.experience,
           domain: me.domain ?? p.domain,
           intent: (me.findMeFor?.[0] ?? p.intent) as ProfileData["intent"],
@@ -351,6 +391,10 @@ export default function ProfilePage() {
           : undefined,
         company: profile.company || undefined,
         college: profile.college || undefined,
+        aspirantOf:
+          profile.type === "aspirant"
+            ? profile.aspirantOf || undefined
+            : undefined,
         experience: profile.experience,
         domain: profile.domain || undefined,
         skills: profile.skills,
@@ -661,6 +705,21 @@ export default function ProfilePage() {
                   />
                 </Field>
               </div>
+              {profile.type === "aspirant" && (
+                <div className="mt-3">
+                  <Field label="Aspirant of">
+                    <GlassSelect
+                      value={profile.aspirantOf}
+                      onChange={(v) => update("aspirantOf", v)}
+                      options={ASPIRANT_OPTIONS}
+                      placeholder="e.g. UPSC, GATE, NEET PG"
+                      searchable
+                      searchPlaceholder="Search or type an exam…"
+                      allowCustom
+                    />
+                  </Field>
+                </div>
+              )}
             </Section>
 
             <Section title="Education & Company">
@@ -932,7 +991,11 @@ function ProfilePreview({ profile }: { profile: ProfileData }) {
   const accent = avatarMeta.ring;
   const accentSoft = `${accent}55`;
   const accentBorder = `${accent}99`;
-  const typeLabel = profile.type ? TYPE_LABEL[profile.type] : "—";
+  const typeLabel = profile.type
+    ? profile.type === "aspirant" && profile.aspirantOf
+      ? `${profile.aspirantOf} Aspirant`
+      : TYPE_LABEL[profile.type]
+    : "—";
 
   return (
     <div

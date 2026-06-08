@@ -57,6 +57,7 @@ export type Profile = {
   role: string | null;
   company: string | null;
   college: string | null;
+  aspirantOf: string | null;
   experience: number | null;
   experienceLevel: string | null;
   practiceYears: number | null;
@@ -80,7 +81,7 @@ export type Intent = string;
 export type CrowSearchFilters = {
   intent: Intent;
   domain: string;
-  personType?: "student" | "professional" | "freelancer";
+  personType?: string;
   location?: string;
   interest?: string;
   goal?: string;
@@ -97,6 +98,7 @@ export type CrowResult = {
   location: string | null;
   domain: string | null;
   personType: string | null;
+  aspirantOf: string | null;
   experience: number | null;
   skills: string[];
   interests: string[];
@@ -115,6 +117,7 @@ export type PublicUser = {
   location: string | null;
   domain: string | null;
   personType: string | null;
+  aspirantOf: string | null;
   experience: number | null;
   skills: string[];
   interests: string[];
@@ -199,6 +202,7 @@ export type ProfilePatch = Partial<{
   role: string;
   company: string;
   college: string;
+  aspirantOf: string;
   experience: number;
   practiceYears: number;
   skills: string[];

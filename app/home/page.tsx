@@ -477,6 +477,11 @@ const USER_TYPES = [
   { value: "student", label: "Student" },
   { value: "professional", label: "Working Professional" },
   { value: "freelancer", label: "Freelancer" },
+  { value: "founder", label: "Founder" },
+  { value: "recruiter", label: "Recruiter" },
+  { value: "investor", label: "Investor" },
+  { value: "explorer", label: "Explorer" },
+  { value: "aspirant", label: "Aspirant" },
 ];
 
 const INTEREST_OPTIONS = [
@@ -779,7 +784,7 @@ export default function HomePage() {
       const data = await api.swipes.feed({
         intent: intent as Intent,
         domain,
-        personType: userType ? (userType as ProfileType) : undefined,
+        personType: userType || undefined,
         location: location || undefined,
         interest: interest || undefined,
         goal: goal || undefined,

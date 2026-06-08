@@ -10,8 +10,31 @@ const roles = [
   { value: "student", label: "Student" },
   { value: "professional", label: "Working Professional" },
   { value: "freelancer", label: "Freelancer" },
+  { value: "founder", label: "Founder" },
+  { value: "recruiter", label: "Recruiter" },
+  { value: "investor", label: "Investor" },
+  { value: "explorer", label: "Explorer" },
+  { value: "aspirant", label: "Aspirant" },
   { value: "other", label: "Other" },
 ];
+
+// Common exams/goals an Aspirant might be preparing for (free-text allowed too).
+const ASPIRANT_OPTIONS = [
+  "UPSC",
+  "GATE",
+  "NEET PG",
+  "NEET UG",
+  "JEE",
+  "CAT",
+  "GRE",
+  "GMAT",
+  "CA",
+  "CFA",
+  "UGC NET",
+  "SSC",
+  "Banking",
+  "CLAT",
+].map((s) => ({ value: s, label: s }));
 
 const domains = [
   { value: "software-developer", label: "Software Developer" },
@@ -52,6 +75,7 @@ export default function RolePage() {
   const [customRole, setCustomRole] = useState("");
   const [domain, setDomain] = useState("");
   const [company, setCompany] = useState("");
+  const [aspirantOf, setAspirantOf] = useState("");
   const [profYears, setProfYears] = useState("");
   const [practiceYears, setPracticeYears] = useState("");
 
@@ -105,6 +129,7 @@ export default function RolePage() {
                 type: effectiveRole,
                 domain,
                 company: role === "professional" ? company.trim() : "",
+                aspirantOf: role === "aspirant" ? aspirantOf.trim() : "",
                 experience: Number(profYears) || 0,
                 practiceYears: Number(practiceYears) || 0,
               };
@@ -116,6 +141,9 @@ export default function RolePage() {
                 domain,
                 ...(role === "professional" && company.trim()
                   ? { company: company.trim() }
+                  : {}),
+                ...(role === "aspirant" && aspirantOf.trim()
+                  ? { aspirantOf: aspirantOf.trim() }
                   : {}),
                 experience: Number(profYears) || 0,
                 practiceYears: Number(practiceYears) || 0,
@@ -202,6 +230,27 @@ export default function RolePage() {
                 placeholder="e.g. Google, Acme Inc."
                 maxLength={80}
                 className="w-full bg-gray-1/50 backdrop-blur-md border-[0.5px] border-white/10 rounded-full px-5 py-[13px] text-cream text-sm outline-none placeholder:text-gray-4 transition-colors focus:border-white/30"
+              />
+            </div>
+          )}
+
+          {role === "aspirant" && (
+            <div className="flex flex-col gap-2">
+              <label
+                htmlFor="aspirantOf"
+                className="text-[11px] uppercase tracking-[0.12em] text-gray-5"
+              >
+                Aspirant of
+              </label>
+              <GlassSelect
+                id="aspirantOf"
+                value={aspirantOf}
+                onChange={setAspirantOf}
+                options={ASPIRANT_OPTIONS}
+                placeholder="e.g. UPSC, GATE, NEET PG"
+                searchable
+                searchPlaceholder="Search or type an exam…"
+                allowCustom
               />
             </div>
           )}
