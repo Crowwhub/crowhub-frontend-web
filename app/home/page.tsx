@@ -343,14 +343,21 @@ const PROFILES: Profile[] = [
   },
 ];
 
+// Display-only label overrides: the *value* must equal the stored findMeFor
+// string, but we can show a friendlier label for a few of them.
+const INTENT_LABELS: Record<string, string> = {
+  "Hire me": "Hiring",
+  "Project Collab": "Project Collaboration",
+};
+
 // Mirrors the unified findMeFor list (UNIVERSAL_TAGS + per-domain tags from
 // app/auth/onboarding/find-me-for/page.tsx). Intent matches against
-// User.findMeFor on the backend, so values here must equal those labels exactly.
+// User.findMeFor on the backend, so the VALUES here must equal those exactly.
 const INTENTS = [
   // Universal — folded-in former purpose values
   "Networking",
-  "Project Collaboration",
-  "Hiring",
+  "Project Collab",
+  "Hire me",
   "Referral",
   // Universal — original findMeFor
   "Co-founder",
@@ -365,6 +372,7 @@ const INTENTS = [
   "Matiks squad",
   "Chess opponent",
   "Reading group",
+  "Career guidance",
   "Just to chat",
   // Software Developer
   "Leetcode partner",
@@ -437,7 +445,7 @@ const INTENTS = [
   "Research buddy",
   "Paper review",
   "Conference co-author",
-].map((s) => ({ value: s, label: s }));
+].map((s) => ({ value: s, label: INTENT_LABELS[s] ?? s }));
 
 const DOMAINS = [
   "Software Developer",
