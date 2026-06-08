@@ -413,6 +413,10 @@ export const api = {
         `/chat/${encodeURIComponent(matchId)}/read`
       );
     },
+    /** Total unread messages across all conversations for the current user. */
+    unreadCount() {
+      return request<{ count: number }>("GET", "/chat/unread-count");
+    },
   },
 
   profileLikes: {

@@ -20,6 +20,7 @@ export default function Sidebar() {
   const [name, setName] = useState("Subham");
   const [avatar, setAvatar] = useState("🐦‍⬛");
   const [pendingRequests, setPendingRequests] = useState(0);
+  const [chatUnread, setChatUnread] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -39,24 +40,30 @@ export default function Sidebar() {
     } catch {}
   }, []);
 
-  // Poll pending swipe requests every 30s.
+  // Poll pending swipe requests + unread chat messages every 30s.
   useEffect(() => {
     let cancelled = false;
-    async function fetchRequests() {
+    async function refresh() {
       try {
         const requests = await api.swipes.requests();
         if (!cancelled) setPendingRequests(requests.length);
       } catch {
         // unauth or backend down — leave count alone.
       }
+      try {
+        const { count } = await api.chat.unreadCount();
+        if (!cancelled) setChatUnread(count);
+      } catch {
+        // ignore
+      }
     }
-    fetchRequests();
-    const id = window.setInterval(fetchRequests, 30_000);
+    refresh();
+    const id = window.setInterval(refresh, 30_000);
     return () => {
       cancelled = true;
       window.clearInterval(id);
     };
-  }, []);
+  }, [pathname]);
 
 
   // Click outside for the bottom menu
@@ -83,7 +90,7 @@ export default function Sidebar() {
       label: "Chat",
       icon: (a) => <ChatIcon active={a} />,
       href: "/chat",
-      unread: true,
+      badge: chatUnread,
     },
     {
       id: "notifications",

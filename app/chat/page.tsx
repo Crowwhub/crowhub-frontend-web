@@ -350,6 +350,7 @@ function ChatPageContent() {
             composer={composer}
             setComposer={setComposer}
             onSend={sendMessage}
+            onBack={() => setSelectedId(null)}
             messagesEndRef={messagesEndRef}
             composerRef={composerRef}
           />
@@ -388,8 +389,12 @@ function ConvList({
 }) {
   const totalUnread = Object.values(unread).reduce((a, b) => a + b, 0);
   return (
-    <aside className="hidden md:flex w-[340px] flex-shrink-0 flex-col border-r border-[#222] bg-gray-1/40 backdrop-blur-md">
-      <div className="px-5 pt-7 pb-4">
+    <aside
+      className={`${
+        selectedId ? "hidden md:flex" : "flex"
+      } w-full md:w-[340px] flex-shrink-0 flex-col border-r border-[#222] bg-gray-1/40 backdrop-blur-md`}
+    >
+      <div className="px-5 pt-7 pb-4 pl-16 md:pl-5">
         <h2 className="font-syne text-[22px] font-extrabold tracking-[-0.5px] text-cream mb-3 flex items-center gap-2">
           Messages
           {totalUnread > 0 && (
@@ -538,6 +543,7 @@ function ConvView({
   composer,
   setComposer,
   onSend,
+  onBack,
   messagesEndRef,
   composerRef,
 }: {
@@ -546,6 +552,7 @@ function ConvView({
   composer: string;
   setComposer: (v: string) => void;
   onSend: () => void;
+  onBack: () => void;
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
   composerRef: React.RefObject<HTMLTextAreaElement | null>;
 }) {
@@ -557,6 +564,24 @@ function ConvView({
   return (
     <section className="flex-1 min-w-0 flex flex-col bg-ink">
       <div className="flex items-center gap-3 px-6 py-4 border-b border-[#222] bg-gray-1/40 backdrop-blur-md">
+        <button
+          type="button"
+          onClick={onBack}
+          aria-label="Back to conversations"
+          className="md:hidden -ml-1 mr-0.5 w-9 h-9 flex-shrink-0 rounded-full flex items-center justify-center text-gray-5 hover:text-cream hover:bg-white/[0.05] transition-colors"
+        >
+          <svg
+            className="w-5 h-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.8}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </button>
         <div
           className="relative flex-shrink-0 rounded-full flex items-center justify-center border-[1.5px]"
           style={{
