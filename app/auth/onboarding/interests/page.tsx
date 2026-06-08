@@ -38,6 +38,7 @@ const INTERESTS: Interest[] = [
   { label: "Food", emoji: "🍜" },
   { label: "Photography", emoji: "📷" },
   { label: "Startups", emoji: "🚀" },
+  { label: "Robotics", emoji: "🦾" },
 ];
 
 const INTEREST_MAP = new Map(INTERESTS.map((i) => [i.label, i]));

@@ -220,6 +220,15 @@ const DOMAIN_OPTIONS = [
   { value: "Lawyer", label: "Lawyer" },
   { value: "Doctor", label: "Doctor" },
   { value: "Architect", label: "Architect" },
+  { value: "Electronics Engineer", label: "Electronics Engineer" },
+  { value: "Embedded Systems Engineer", label: "Embedded Systems Engineer" },
+  { value: "Robotics Engineer", label: "Robotics Engineer" },
+  { value: "Hardware Engineer", label: "Hardware Engineer" },
+  { value: "IoT Engineer", label: "IoT Engineer" },
+  { value: "Electrical Engineer", label: "Electrical Engineer" },
+  { value: "Mechatronics Engineer", label: "Mechatronics Engineer" },
+  { value: "VLSI Engineer", label: "VLSI Engineer" },
+  { value: "Firmware Engineer", label: "Firmware Engineer" },
   { value: "Other", label: "Other" },
 ];
 
@@ -277,6 +286,7 @@ const ALL_INTERESTS: { label: string; emoji: string }[] = [
   { label: "Food", emoji: "🍜" },
   { label: "Photography", emoji: "📷" },
   { label: "Startups", emoji: "🚀" },
+  { label: "Robotics", emoji: "🦾" },
 ];
 
 const TYPE_LABEL: Record<Exclude<ProfileType, "">, string> = {

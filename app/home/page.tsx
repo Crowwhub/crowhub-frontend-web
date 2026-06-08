@@ -471,6 +471,15 @@ const DOMAINS = [
   "Lawyer",
   "Doctor",
   "Architect",
+  "Electronics Engineer",
+  "Embedded Systems Engineer",
+  "Robotics Engineer",
+  "Hardware Engineer",
+  "IoT Engineer",
+  "Electrical Engineer",
+  "Mechatronics Engineer",
+  "VLSI Engineer",
+  "Firmware Engineer",
   "Entrepreneur",
 ].map((s) => ({ value: s, label: s }));
 
@@ -518,6 +527,7 @@ const INTEREST_OPTIONS = [
   { value: "Food", label: "Food" },
   { value: "Photography", label: "Photography" },
   { value: "Startups", label: "Startups" },
+  { value: "Robotics", label: "Robotics" },
 ];
 
 const GOAL_OPTIONS = [

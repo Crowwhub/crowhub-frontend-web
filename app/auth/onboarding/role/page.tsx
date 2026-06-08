@@ -68,6 +68,15 @@ const domains = [
   { value: "lawyer", label: "Lawyer" },
   { value: "doctor", label: "Doctor" },
   { value: "architect", label: "Architect" },
+  { value: "electronics-engineer", label: "Electronics Engineer" },
+  { value: "embedded-engineer", label: "Embedded Systems Engineer" },
+  { value: "robotics-engineer", label: "Robotics Engineer" },
+  { value: "hardware-engineer", label: "Hardware Engineer" },
+  { value: "iot-engineer", label: "IoT Engineer" },
+  { value: "electrical-engineer", label: "Electrical Engineer" },
+  { value: "mechatronics-engineer", label: "Mechatronics Engineer" },
+  { value: "vlsi-engineer", label: "VLSI Engineer" },
+  { value: "firmware-engineer", label: "Firmware Engineer" },
 ];
 
 export default function RolePage() {
