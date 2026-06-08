@@ -26,6 +26,18 @@ const INTERESTS: Interest[] = [
   { label: "Collaboration", emoji: "🌐" },
   { label: "Mobile Development", emoji: "📱" },
   { label: "Open Source", emoji: "🌱" },
+  { label: "Sports", emoji: "⚽" },
+  { label: "Anime", emoji: "🍥" },
+  { label: "Gaming", emoji: "🎮" },
+  { label: "Standup Comedy", emoji: "🎙️" },
+  { label: "Music", emoji: "🎵" },
+  { label: "Movies & TV", emoji: "🎬" },
+  { label: "Travel", emoji: "✈️" },
+  { label: "Fitness", emoji: "🏋️" },
+  { label: "Reading", emoji: "📚" },
+  { label: "Food", emoji: "🍜" },
+  { label: "Photography", emoji: "📷" },
+  { label: "Startups", emoji: "🚀" },
 ];
 
 const INTEREST_MAP = new Map(INTERESTS.map((i) => [i.label, i]));

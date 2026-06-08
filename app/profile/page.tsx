@@ -16,7 +16,8 @@ type ProfileType =
   | "recruiter"
   | "investor"
   | "explorer"
-  | "aspirant";
+  | "aspirant"
+  | "educator";
 type Intent = "" | "networking" | "hiring" | "referral" | "mentorship";
 
 type ProfileData = {
@@ -138,6 +139,9 @@ const UNIVERSAL_FIND_TAGS: { label: string; emoji: string }[] = [
   { label: "Matiks squad", emoji: "🔢" },
   { label: "Chess opponent", emoji: "♟️" },
   { label: "Reading group", emoji: "📖" },
+  { label: "Leetcode partner", emoji: "🧩" },
+  { label: "Career guidance", emoji: "🧭" },
+  { label: "Tech interview prep", emoji: "💼" },
   { label: "Just to chat", emoji: "💬" },
 ];
 
@@ -180,6 +184,7 @@ const TYPE_OPTIONS = [
   { value: "investor", label: "Investor" },
   { value: "explorer", label: "Explorer" },
   { value: "aspirant", label: "Aspirant" },
+  { value: "educator", label: "Educator" },
 ];
 
 // Common exams/goals an Aspirant might be preparing for (free-text allowed too).
@@ -260,6 +265,18 @@ const ALL_INTERESTS: { label: string; emoji: string }[] = [
   { label: "Collaboration", emoji: "🌐" },
   { label: "Mobile Development", emoji: "📱" },
   { label: "Open Source", emoji: "🌱" },
+  { label: "Sports", emoji: "⚽" },
+  { label: "Anime", emoji: "🍥" },
+  { label: "Gaming", emoji: "🎮" },
+  { label: "Standup Comedy", emoji: "🎙️" },
+  { label: "Music", emoji: "🎵" },
+  { label: "Movies & TV", emoji: "🎬" },
+  { label: "Travel", emoji: "✈️" },
+  { label: "Fitness", emoji: "🏋️" },
+  { label: "Reading", emoji: "📚" },
+  { label: "Food", emoji: "🍜" },
+  { label: "Photography", emoji: "📷" },
+  { label: "Startups", emoji: "🚀" },
 ];
 
 const TYPE_LABEL: Record<Exclude<ProfileType, "">, string> = {
@@ -271,6 +288,7 @@ const TYPE_LABEL: Record<Exclude<ProfileType, "">, string> = {
   investor: "Investor",
   explorer: "Explorer",
   aspirant: "Aspirant",
+  educator: "Educator",
 };
 
 /* ============================================================ Page */

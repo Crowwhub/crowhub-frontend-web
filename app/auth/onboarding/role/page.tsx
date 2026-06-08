@@ -15,6 +15,7 @@ const roles = [
   { value: "investor", label: "Investor" },
   { value: "explorer", label: "Explorer" },
   { value: "aspirant", label: "Aspirant" },
+  { value: "educator", label: "Educator" },
   { value: "other", label: "Other" },
 ];
 

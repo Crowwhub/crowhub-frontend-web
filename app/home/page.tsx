@@ -482,6 +482,7 @@ const USER_TYPES = [
   { value: "investor", label: "Investor" },
   { value: "explorer", label: "Explorer" },
   { value: "aspirant", label: "Aspirant" },
+  { value: "educator", label: "Educator" },
 ];
 
 const INTEREST_OPTIONS = [
@@ -503,6 +504,18 @@ const INTEREST_OPTIONS = [
   { value: "Collaboration", label: "Collaboration" },
   { value: "Mobile Development", label: "Mobile Development" },
   { value: "Open Source", label: "Open Source" },
+  { value: "Sports", label: "Sports" },
+  { value: "Anime", label: "Anime" },
+  { value: "Gaming", label: "Gaming" },
+  { value: "Standup Comedy", label: "Standup Comedy" },
+  { value: "Music", label: "Music" },
+  { value: "Movies & TV", label: "Movies & TV" },
+  { value: "Travel", label: "Travel" },
+  { value: "Fitness", label: "Fitness" },
+  { value: "Reading", label: "Reading" },
+  { value: "Food", label: "Food" },
+  { value: "Photography", label: "Photography" },
+  { value: "Startups", label: "Startups" },
 ];
 
 const GOAL_OPTIONS = [

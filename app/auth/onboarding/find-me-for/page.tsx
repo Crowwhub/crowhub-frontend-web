@@ -114,6 +114,9 @@ const UNIVERSAL_TAGS: Tag[] = [
   { label: "Matiks squad", emoji: "🔢" },
   { label: "Chess opponent", emoji: "♟️" },
   { label: "Reading group", emoji: "📖" },
+  { label: "Leetcode partner", emoji: "🧩" },
+  { label: "Career guidance", emoji: "🧭" },
+  { label: "Tech interview prep", emoji: "💼" },
   { label: "Just to chat", emoji: "💬" },
 ];
 
