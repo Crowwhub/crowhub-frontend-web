@@ -44,8 +44,18 @@ export default function GlassSelect({
 
   useEffect(() => {
     if (open && searchable) {
-      // Defer so the input is mounted before we focus.
-      requestAnimationFrame(() => inputRef.current?.focus());
+      // Only auto-focus on fine pointers (desktop). On touch devices, focusing
+      // pops the soft keyboard, and the first tap on an option then gets
+      // consumed dismissing the keyboard instead of selecting — leaving the
+      // dropdown open until you tap blank space.
+      const coarsePointer =
+        typeof window !== "undefined" &&
+        typeof window.matchMedia === "function" &&
+        window.matchMedia("(pointer: coarse)").matches;
+      if (!coarsePointer) {
+        // Defer so the input is mounted before we focus.
+        requestAnimationFrame(() => inputRef.current?.focus());
+      }
     }
     if (!open) setQuery("");
   }, [open, searchable]);
@@ -110,6 +120,7 @@ export default function GlassSelect({
               allowCustom && query.trim() ? (
                 <button
                   type="button"
+                  onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
                     onChange(query.trim());
                     setOpen(false);
@@ -131,6 +142,7 @@ export default function GlassSelect({
                     type="button"
                     role="option"
                     aria-selected={isSelected}
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
                       onChange(opt.value);
                       setOpen(false);
