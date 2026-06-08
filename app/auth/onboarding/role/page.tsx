@@ -180,6 +180,8 @@ export default function RolePage() {
               }}
               options={roles}
               placeholder="Select role"
+              searchable
+              searchPlaceholder="Search roles…"
             />
             {role === "other" && (
               <input
