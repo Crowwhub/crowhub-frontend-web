@@ -6,6 +6,7 @@ import Sidebar from "@/components/Sidebar";
 import LikeHeart from "@/components/LikeHeart";
 import { api, ApiError, type MatchRecord, type PublicUser } from "@/lib/api";
 import { useProfileLikes } from "@/lib/useProfileLikes";
+import { intentLabel } from "@/lib/intentLabel";
 
 const LIKE_ACCENT = "#6aab7a";
 
@@ -416,7 +417,9 @@ function MatchProfileModal({
           {match.intent && (
             <div className="text-[13.5px] text-cream/85 mb-5 leading-snug">
               Matched on{" "}
-              <span className="text-cream font-medium">{match.intent}</span>
+              <span className="text-cream font-medium">
+                {intentLabel(match.intent)}
+              </span>
             </div>
           )}
 
@@ -603,7 +606,9 @@ function MatchRow({
           <div className="text-[12.5px] text-gray-5 mt-0.5 leading-tight truncate">
             {match.role} at {match.company}
             <span className="text-gray-4 mx-1.5">·</span>
-            <span className="text-cream font-semibold">{match.intent}</span>
+            <span className="text-cream font-semibold">
+              {intentLabel(match.intent)}
+            </span>
           </div>
         </div>
       </button>

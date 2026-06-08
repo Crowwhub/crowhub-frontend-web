@@ -4,6 +4,7 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import { useSearchParams } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import { useChatSocket } from "@/lib/useChatSocket";
+import { intentLabel } from "@/lib/intentLabel";
 import {
   api,
   ApiError,
@@ -579,7 +580,7 @@ function ConvView({
               <>
                 <span className="text-gray-4 mx-1.5">·</span>
                 <span className="text-cream font-medium">
-                  {conversation.intent}
+                  {intentLabel(conversation.intent)}
                 </span>
               </>
             )}

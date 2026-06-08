@@ -16,6 +16,7 @@ import {
   type ConfigMatch,
 } from "@/lib/api";
 import { useProfileLikes } from "@/lib/useProfileLikes";
+import { INTENT_LABELS } from "@/lib/intentLabel";
 
 type ProfileType = "student" | "professional" | "freelancer";
 
@@ -342,13 +343,6 @@ const PROFILES: Profile[] = [
     interests: ["Collaboration", "Exploring Opportunities"],
   },
 ];
-
-// Display-only label overrides: the *value* must equal the stored findMeFor
-// string, but we can show a friendlier label for a few of them.
-const INTENT_LABELS: Record<string, string> = {
-  "Hire me": "Hiring",
-  "Project Collab": "Project Collaboration",
-};
 
 // Mirrors the unified findMeFor list (UNIVERSAL_TAGS + per-domain tags from
 // app/auth/onboarding/find-me-for/page.tsx). Intent matches against

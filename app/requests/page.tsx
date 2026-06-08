@@ -5,6 +5,7 @@ import Sidebar from "@/components/Sidebar";
 import LikeHeart from "@/components/LikeHeart";
 import { api, ApiError, type SwipeFilters, type SwipeRequest } from "@/lib/api";
 import { useProfileLikes } from "@/lib/useProfileLikes";
+import { intentLabel } from "@/lib/intentLabel";
 
 const ACCENT = "#6aab7a";
 
@@ -172,7 +173,9 @@ function RequestCard({
             <div className="text-[12.5px] text-cream/85 mt-1.5">
               <div className="truncate">
                 Sent you a request for{" "}
-                <span className="text-cream font-medium">{request.intent}</span>
+                <span className="text-cream font-medium">
+                  {intentLabel(request.intent)}
+                </span>
               </div>
               <FilterContext
                 filters={request.filters}
