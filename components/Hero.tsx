@@ -21,11 +21,19 @@ export default function Hero() {
           <br />
           <span className="text-[#555]">People.</span>
         </h1>
-        <p className="text-[15px] text-gray-5 leading-[1.6] max-w-[440px] mb-5 font-light">
-          CrowHub is an intent-first people discovery platform where
-          connections start with purpose, not randomness. Discover people based
-          on shared goals, interests, and intent.
-        </p>
+        <div className="max-w-[440px] mb-5">
+          <p className="text-[16px] text-cream/90 leading-[1.6] font-medium mb-3">
+            People aren’t hard to find. The right people are.
+          </p>
+          <p className="text-[15px] text-gray-5 leading-[1.6] font-light mb-3">
+            Discover people through shared goals, interests, and intent.
+          </p>
+          <p className="text-[14px] text-gray-5 leading-[1.6] font-light">
+            Whether you’re looking to learn, collaborate, grow, network, or
+            simply meet like-minded people, CrowHub helps you find people with
+            the same intent.
+          </p>
+        </div>
         <div className="flex items-center gap-3 flex-wrap">
           <Link
             href="/auth"
