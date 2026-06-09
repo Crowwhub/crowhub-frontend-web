@@ -41,9 +41,12 @@ export default function Hero() {
           >
             Find Your Crows →
           </Link>
-          <button className="bg-transparent text-gray-5 border-[0.5px] border-gray-3 px-6 py-[12px] rounded-full text-[14px] cursor-pointer transition-colors hover:text-cream hover:border-gray-5">
-            See how it works
-          </button>
+          <Link
+            href="/why"
+            className="bg-transparent text-gray-5 border-[0.5px] border-gray-3 px-6 py-[12px] rounded-full text-[14px] cursor-pointer transition-colors hover:text-cream hover:border-gray-5"
+          >
+            Why CrowHub?
+          </Link>
         </div>
       </div>
 
