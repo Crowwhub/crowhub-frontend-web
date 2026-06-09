@@ -91,10 +91,10 @@ export default function Nav() {
 
   return (
     <div className="sticky top-4 z-50 mt-6 mb-10 px-4 flex justify-center">
-      <nav className="w-full max-w-[700px] flex items-center justify-between gap-6 px-5 py-2.5 rounded-2xl border-[0.5px] border-white/10 bg-white/[0.04] backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.06)]">
+      <nav className="w-full max-w-[700px] flex items-center justify-between gap-3 sm:gap-6 px-3 sm:px-5 py-2.5 rounded-2xl border-[0.5px] border-white/10 bg-white/[0.04] backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.06)]">
         <Link
           href="/"
-          className="flex items-center gap-2 font-syne font-extrabold text-[18px] tracking-[-0.5px] text-cream"
+          className="flex items-center gap-2 font-syne font-extrabold text-[18px] tracking-[-0.5px] text-cream shrink-0"
         >
           <img
             src="/crowhub_logo.png"
@@ -125,16 +125,16 @@ export default function Nav() {
             aria-hidden="true"
           />
         ) : status === "guest" ? (
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2.5 sm:gap-4 shrink-0">
             <Link
               href="/auth/login"
-              className="text-gray-5 text-[13px] transition-colors hover:text-cream"
+              className="text-gray-5 text-[13px] transition-colors hover:text-cream whitespace-nowrap"
             >
               Log in
             </Link>
             <Link
               href="/auth/signup"
-              className="text-cream border-[0.5px] border-white/25 px-[18px] py-2 rounded-full text-[13px] font-medium cursor-pointer bg-gradient-to-b from-white/20 to-white/5 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_4px_12px_rgba(0,0,0,0.25)] transition-all duration-150 hover:from-white/30 hover:to-white/10 hover:scale-[0.97]"
+              className="text-cream border-[0.5px] border-white/25 px-3.5 sm:px-[18px] py-2 rounded-full text-[13px] font-medium cursor-pointer bg-gradient-to-b from-white/20 to-white/5 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_4px_12px_rgba(0,0,0,0.25)] transition-all duration-150 hover:from-white/30 hover:to-white/10 hover:scale-[0.97] whitespace-nowrap"
             >
               Join now →
             </Link>
