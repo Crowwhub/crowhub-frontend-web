@@ -204,10 +204,10 @@ export default function WhyCrowHubPage() {
       </div>
 
       <Hero />
+      <KnowWhy />
       <RightPeople />
       <IntentCards />
       <MatchIntent />
-      <KnowWhy />
       <LessRandom />
       <FinalCTA />
     </div>
