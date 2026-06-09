@@ -637,9 +637,9 @@ function KnowWhy() {
           </Reveal>
           <Reveal delay={0.08} className="mt-5">
             <p className={DESC}>
-              Most platforms show people.{" "}
+              Most platforms show Who Connected.{" "}
               <span className="text-cream font-medium">
-                CrowHub shows context.
+                CrowHub shows Who and Why.
               </span>
             </p>
           </Reveal>
