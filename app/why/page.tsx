@@ -543,57 +543,181 @@ function MatchIntent() {
 
 /* ============================================================ Section 5 */
 
-const BADGES = ["Networking", "Mentorship", "Collaborate", "Hiring", "Learn", "Build"];
+const MATCH_BADGES = ["Building Startup", "Learning AI", "Looking for Collaborators"];
+const KNOW_POINTS = [
+  "Why this person matches you",
+  "What goals you share",
+  "What interests overlap",
+  "What they’re looking for",
+  "Why connecting makes sense",
+];
+
+function MatchMini({
+  emoji,
+  name,
+  role,
+  you,
+  delay = 0,
+}: {
+  emoji: string;
+  name: string;
+  role: string;
+  you?: boolean;
+  delay?: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9, x: you ? -20 : 20 }}
+      whileInView={{ opacity: 1, scale: 1, x: 0 }}
+      viewport={{ once: true, amount: 0.4 }}
+      transition={{ duration: 0.6, ease: EASE, delay }}
+      className="flex-1 min-w-0 rounded-2xl border-[0.5px] p-3.5 text-center"
+      style={{
+        borderColor: you ? "rgba(255,255,255,0.12)" : "rgba(106,171,122,0.45)",
+        background: you
+          ? "rgba(26,26,26,0.5)"
+          : "linear-gradient(180deg, rgba(106,171,122,0.1), rgba(26,26,26,0.5))",
+        boxShadow: you ? undefined : "0 0 30px rgba(106,171,122,0.18)",
+      }}
+    >
+      <div className="mx-auto w-12 h-12 rounded-full bg-gray-1 border-[0.5px] border-white/15 flex items-center justify-center text-[24px] mb-2">
+        {emoji}
+      </div>
+      <div className="font-syne text-[14px] font-bold text-cream truncate">
+        {name}
+      </div>
+      <div className="text-[11px] text-gray-5 truncate">{role}</div>
+    </motion.div>
+  );
+}
+
+function Connector() {
+  return (
+    <div className="relative flex-shrink-0 w-9 sm:w-14 h-px">
+      <motion.div
+        initial={{ scaleX: 0 }}
+        whileInView={{ scaleX: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.7, ease: EASE, delay: 0.35 }}
+        className="absolute inset-0 origin-left"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, rgba(106,171,122,0.85), transparent)",
+        }}
+      />
+      <motion.span
+        initial={{ scale: 0, opacity: 0 }}
+        whileInView={{ scale: 1, opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4, ease: EASE, delay: 0.7 }}
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-sage-light"
+        style={{ boxShadow: "0 0 14px rgba(106,171,122,0.9)" }}
+      />
+    </div>
+  );
+}
 
 function KnowWhy() {
   return (
     <Section>
       <GlowBlob
-        className="top-[30%] left-[50%] -translate-x-1/2 w-[480px] h-[280px] opacity-[0.12]"
+        className="top-[28%] left-[50%] -translate-x-1/2 w-[520px] h-[300px] opacity-[0.12]"
         color="rgba(224,155,69,0.4)"
       />
-      <Reveal className="text-center">
-        <h2 className={H2}>Know why you’re connecting.</h2>
-      </Reveal>
-      <Reveal delay={0.1} className="text-center mt-6 max-w-[520px]">
-        <p className={DESC}>
-          Every profile carries context. Not just{" "}
-          <span className="text-gray-4 italic">“Who is this person?”</span> but{" "}
-          <span className="text-cream font-medium">
-            “Why do they want to connect?”
-          </span>
-        </p>
-      </Reveal>
 
-      <motion.div
-        variants={container}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.3 }}
-        className="flex flex-wrap items-center justify-center gap-3 mt-12 max-w-[600px]"
-      >
-        {BADGES.map((b) => (
-          <motion.span
-            key={b}
-            variants={{
-              hidden: { opacity: 0, scale: 0.6 },
-              show: {
-                opacity: 1,
-                scale: 1,
-                transition: { duration: 0.55, ease: EASE },
-              },
-            }}
-            whileHover={{ scale: 1.08 }}
-            className="text-[13px] sm:text-[15px] text-cream rounded-full px-4 py-2 border-[0.5px] border-sage-light/40"
-            style={{
-              background: "rgba(106,171,122,0.1)",
-              boxShadow: "0 0 22px rgba(106,171,122,0.22)",
-            }}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center w-full max-w-[1000px]">
+        {/* Left: copy */}
+        <div>
+          <Reveal>
+            <h2 className={H2}>
+              Not just who.
+              <br />
+              <span className="text-sage-light">Why.</span>
+            </h2>
+          </Reveal>
+          <Reveal delay={0.08} className="mt-5">
+            <p className={DESC}>
+              Most platforms show people.{" "}
+              <span className="text-cream font-medium">
+                CrowHub shows context.
+              </span>
+            </p>
+          </Reveal>
+          <Reveal delay={0.14} className="mt-6">
+            <div className="text-[11px] uppercase tracking-[0.16em] text-gray-5 mb-3">
+              You’ll know
+            </div>
+            <ul className="flex flex-col gap-2.5">
+              {KNOW_POINTS.map((p) => (
+                <li
+                  key={p}
+                  className="flex items-center gap-2.5 text-[14px] sm:text-[15px] text-gray-5"
+                >
+                  <span className="text-sage-light">✓</span>
+                  {p}
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+          <Reveal delay={0.2} className="mt-6">
+            <p className="text-[14px] text-gray-4 leading-[1.7]">
+              No guessing. No cold networking.{" "}
+              <span className="text-cream">Just relevant connections.</span>
+            </p>
+          </Reveal>
+        </div>
+
+        {/* Right: animated match visualization */}
+        <div className="relative">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <MatchMini emoji="🐦‍⬛" name="You" role="Build · AI" you delay={0} />
+            <Connector />
+            <MatchMini emoji="🦅" name="Aanya R." role="Founder · AI" delay={0.15} />
+          </div>
+
+          {/* Intent badges lighting up */}
+          <div className="mt-6 flex flex-col gap-2">
+            {MATCH_BADGES.map((b, i) => (
+              <motion.div
+                key={b}
+                initial={{ opacity: 0, x: -12 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, ease: EASE, delay: 0.6 + i * 0.18 }}
+                className="flex items-center gap-2.5 rounded-full px-4 py-2.5 border-[0.5px] border-sage-light/40 w-fit"
+                style={{
+                  background: "rgba(106,171,122,0.1)",
+                  boxShadow: "0 0 22px rgba(106,171,122,0.2)",
+                }}
+              >
+                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-sage-light text-ink text-[12px] font-bold">
+                  ✓
+                </span>
+                <span className="text-[13px] sm:text-[14px] text-cream font-medium">
+                  {b}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Explanation card */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: EASE, delay: 1.2 }}
+            className="mt-5 rounded-2xl border-[0.5px] border-white/12 bg-gray-1/60 backdrop-blur-md p-4"
           >
-            ↗ {b}
-          </motion.span>
-        ))}
-      </motion.div>
+            <div className="text-[10px] uppercase tracking-[0.16em] text-sage-light mb-1.5">
+              Why matched
+            </div>
+            <p className="text-[13.5px] text-cream/90 leading-[1.55]">
+              “Matched because both are looking for startup collaborators and
+              share interests in AI.”
+            </p>
+          </motion.div>
+        </div>
+      </div>
     </Section>
   );
 }
