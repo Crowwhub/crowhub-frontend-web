@@ -336,3 +336,18 @@ body::before {
 .crow-tour .driver-popover-arrow-side-right.driver-popover-arrow {
   border-right-color: #161616;
 }
+
+/* Soft pulsing glow for accent buttons (e.g. "Why CrowHub?") */
+@keyframes btn-glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 16px rgba(106, 171, 122, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 34px rgba(106, 171, 122, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+}
+.animate-btn-glow {
+  animation: btn-glow-pulse 3s ease-in-out infinite;
+}

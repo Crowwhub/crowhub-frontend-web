@@ -43,7 +43,7 @@ export default function Hero() {
           </Link>
           <Link
             href="/why"
-            className="bg-transparent text-gray-5 border-[0.5px] border-gray-3 px-6 py-[12px] rounded-full text-[14px] cursor-pointer transition-colors hover:text-cream hover:border-gray-5"
+            className="animate-btn-glow text-cream border-[0.5px] border-sage-light/50 bg-sage-light/[0.06] px-6 py-[12px] rounded-full text-[14px] font-medium cursor-pointer transition-all duration-150 hover:border-sage-light hover:bg-sage-light/[0.12] hover:scale-[0.98]"
           >
             Why CrowHub?
           </Link>
