@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import GlassSelect from "@/components/GlassSelect";
 import Sidebar from "@/components/Sidebar";
-import { ApiError, api } from "@/lib/api";
+import { ApiError, api, type ShowcaseItem } from "@/lib/api";
 
 /* ============================================================ Types & data */
 
@@ -39,6 +39,7 @@ type ProfileData = {
   currentlyWorkingOn: string;
   goals: string[];
   findMeFor: string[];
+  showcase: ShowcaseItem[];
 };
 
 const DEFAULT_PROFILE: ProfileData = {
@@ -60,7 +61,17 @@ const DEFAULT_PROFILE: ProfileData = {
   currentlyWorkingOn: "",
   goals: [],
   findMeFor: [],
+  showcase: [],
 };
+
+const SHOWCASE_TYPES = [
+  "Project",
+  "Product",
+  "Achievement",
+  "Experience",
+  "Certification",
+  "Other",
+].map((s) => ({ value: s, label: s }));
 
 const DOMAIN_FIND_TAGS: Record<string, { label: string; emoji: string }[]> = {
   "Software Developer": [
@@ -362,6 +373,7 @@ export default function ProfilePage() {
           currentlyWorkingOn: me.currentlyWorkingOn ?? p.currentlyWorkingOn,
           goals: me.goals ?? p.goals,
           findMeFor: me.findMeFor ?? p.findMeFor,
+          showcase: me.showcase ?? p.showcase,
         }));
       } catch {
         // Fall back to local cache (e.g. visitor not logged in yet)
@@ -434,6 +446,14 @@ export default function ProfilePage() {
         currentlyWorkingOn: profile.currentlyWorkingOn || undefined,
         goals: profile.goals,
         findMeFor: profile.findMeFor,
+        showcase: profile.showcase
+          .map((s) => ({
+            title: s.title.trim(),
+            type: (s.type || "Project").trim(),
+            description: s.description.trim(),
+            link: s.link.trim(),
+          }))
+          .filter((s) => s.title),
       });
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
@@ -470,6 +490,22 @@ export default function ProfilePage() {
   function toggleInterest(label: string) {
     const has = profile.interests.includes(label);
     update("interests", has ? profile.interests.filter((i) => i !== label) : [...profile.interests, label]);
+  }
+
+  function addShowcase() {
+    update("showcase", [
+      ...profile.showcase,
+      { title: "", type: "Project", description: "", link: "" },
+    ]);
+  }
+  function updateShowcase(index: number, key: keyof ShowcaseItem, value: string) {
+    update(
+      "showcase",
+      profile.showcase.map((s, i) => (i === index ? { ...s, [key]: value } : s)),
+    );
+  }
+  function removeShowcase(index: number) {
+    update("showcase", profile.showcase.filter((_, i) => i !== index));
   }
 
   return (
@@ -766,6 +802,81 @@ export default function ProfilePage() {
                     placeholder="e.g. Google"
                   />
                 </Field>
+              </div>
+            </Section>
+
+            <Section title="🏆 Showcase">
+              <div className="flex flex-col gap-4">
+                {profile.showcase.length === 0 && (
+                  <p className="text-[12px] text-gray-4 italic">
+                    Add projects, products, achievements — anything you’ve built
+                    or done. Others see a “See my showcase” link on your card.
+                  </p>
+                )}
+                {profile.showcase.map((s, i) => (
+                  <div
+                    key={i}
+                    className="rounded-2xl border-[0.5px] border-white/10 bg-gray-1/40 p-4 flex flex-col gap-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] uppercase tracking-[0.14em] text-gray-5">
+                        Item {i + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeShowcase(i)}
+                        className="text-[12px] text-gray-5 hover:text-[#e08080] transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <Field label="Title">
+                        <TextInput
+                          value={s.title}
+                          onChange={(v) => updateShowcase(i, "title", v)}
+                          placeholder="e.g. Built CrowHub"
+                        />
+                      </Field>
+                      <Field label="Type">
+                        <GlassSelect
+                          value={s.type}
+                          onChange={(v) => updateShowcase(i, "type", v)}
+                          options={SHOWCASE_TYPES}
+                          placeholder="Project"
+                          searchable
+                          allowCustom
+                          searchPlaceholder="Search or type…"
+                        />
+                      </Field>
+                    </div>
+                    <Field label="Description">
+                      <textarea
+                        value={s.description}
+                        onChange={(e) =>
+                          updateShowcase(i, "description", e.target.value)
+                        }
+                        rows={2}
+                        placeholder="One line on what it is."
+                        className="w-full bg-gray-1/50 backdrop-blur-md border-[0.5px] border-white/10 rounded-2xl px-5 py-3 text-cream text-sm outline-none placeholder:text-gray-4 transition-colors focus:border-white/30 leading-snug font-light resize-y"
+                      />
+                    </Field>
+                    <Field label="Link">
+                      <TextInput
+                        value={s.link}
+                        onChange={(v) => updateShowcase(i, "link", v)}
+                        placeholder="https://crowhub.club"
+                      />
+                    </Field>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addShowcase}
+                  className="self-start inline-flex items-center gap-1.5 text-cream border-[0.5px] border-white/30 px-5 py-2.5 rounded-full text-[13px] font-medium cursor-pointer bg-gradient-to-b from-white/20 to-white/5 backdrop-blur-md hover:from-white/30 hover:to-white/10 transition-all"
+                >
+                  <span className="text-gray-4">+</span> Add showcase item
+                </button>
               </div>
             </Section>
 
@@ -1185,6 +1296,29 @@ function ProfilePreview({ profile }: { profile: ProfileData }) {
             {profile.interests.length > 5 && (
               <span className="text-[11px] text-gray-5 px-1 py-1">
                 +{profile.interests.length - 5} more
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {profile.showcase.length > 0 && (
+        <div className="mb-4">
+          <div className="text-[10px] uppercase tracking-[0.14em] text-gray-5 mb-2">
+            🏆 Showcase
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {profile.showcase.slice(0, 4).map((s, i) => (
+              <span
+                key={i}
+                className="text-[11px] text-cream border-[0.5px] border-white/15 bg-white/[0.06] px-2.5 py-1 rounded-full"
+              >
+                {s.title}
+              </span>
+            ))}
+            {profile.showcase.length > 4 && (
+              <span className="text-[11px] text-gray-5 px-1 py-1">
+                +{profile.showcase.length - 4} more
               </span>
             )}
           </div>

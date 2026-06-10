@@ -7,6 +7,7 @@ import LikeHeart from "@/components/LikeHeart";
 import { api, ApiError, type MatchRecord, type PublicUser } from "@/lib/api";
 import { useProfileLikes } from "@/lib/useProfileLikes";
 import { intentLabel } from "@/lib/intentLabel";
+import ShowcaseList from "@/components/ShowcaseList";
 
 const LIKE_ACCENT = "#6aab7a";
 
@@ -484,6 +485,12 @@ function MatchProfileModal({
               />
             </MSection>
           )}
+
+          {u.showcase && u.showcase.length > 0 && (
+            <MSection title="🏆 Showcase">
+              <ShowcaseList items={u.showcase} />
+            </MSection>
+          )}
         </div>
 
         <div className="flex items-center justify-between gap-3 p-6 border-t border-[#1d1d1d]">
@@ -612,6 +619,11 @@ function MatchRow({
               {intentLabel(match.intent)}
             </span>
           </div>
+          {match.user.showcase && match.user.showcase.length > 0 && (
+            <span className="mt-1 inline-flex items-center gap-1 text-[11px] text-sage-light">
+              🏆 See my showcase →
+            </span>
+          )}
         </div>
       </button>
 

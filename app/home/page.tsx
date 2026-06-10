@@ -14,9 +14,11 @@ import {
   type CrowResult,
   type Intent,
   type ConfigMatch,
+  type ShowcaseItem,
 } from "@/lib/api";
 import { useProfileLikes } from "@/lib/useProfileLikes";
 import { INTENT_LABELS } from "@/lib/intentLabel";
+import ShowcaseList from "@/components/ShowcaseList";
 
 type ProfileType = "student" | "professional" | "freelancer";
 
@@ -36,6 +38,7 @@ type Profile = {
   goals?: string[];
   findMeFor?: string[];
   currentlyWorkingOn?: string;
+  showcase?: ShowcaseItem[];
 };
 
 function toProfile(c: CrowResult): Profile {
@@ -66,6 +69,7 @@ function toProfile(c: CrowResult): Profile {
     goals: c.goals ?? [],
     findMeFor: c.findMeFor ?? [],
     currentlyWorkingOn: c.currentlyWorkingOn ?? undefined,
+    showcase: c.showcase ?? [],
   };
 }
 
@@ -1702,6 +1706,19 @@ function ProfileCard({
         </div>
       </div>
 
+      {profile.showcase && profile.showcase.length > 0 && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onExpand();
+          }}
+          className="mb-4 w-full inline-flex items-center justify-center gap-1.5 text-[12px] font-medium text-sage-light border-[0.5px] border-sage-light/40 bg-sage-light/[0.06] rounded-full py-2 hover:bg-sage-light/[0.12] transition-colors"
+        >
+          🏆 See my showcase →
+        </button>
+      )}
+
       <div className="flex items-center justify-between pt-4 border-t border-[#222]">
         <span
           className="text-[11px] uppercase tracking-[0.14em]"
@@ -2024,6 +2041,15 @@ function ProfileDetailModal({
             ))}
           </div>
         </section>
+
+        {profile.showcase && profile.showcase.length > 0 && (
+          <section>
+            <div className="text-[10px] uppercase tracking-[0.14em] text-gray-5 mb-2">
+              🏆 Showcase
+            </div>
+            <ShowcaseList items={profile.showcase} />
+          </section>
+        )}
       </div>
     </div>
   );

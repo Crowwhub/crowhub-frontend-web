@@ -68,11 +68,20 @@ export type Profile = {
   findMeFor: string[];
   goals: string[];
   currentlyWorkingOn: string | null;
+  showcase: ShowcaseItem[] | null;
   promptTagline: string | null;
   madeTillFar: string | null;
   onboardingComplete: boolean;
   createdAt: string;
   updatedAt: string;
+};
+
+// A showcase entry — something the user has built/done.
+export type ShowcaseItem = {
+  title: string;
+  type: string;
+  description: string;
+  link: string;
 };
 
 // Free-text findMeFor value used as the home-page filter.
@@ -105,6 +114,7 @@ export type CrowResult = {
   goals: string[];
   findMeFor: string[];
   currentlyWorkingOn: string | null;
+  showcase: ShowcaseItem[] | null;
   intent: Intent;
 };
 
@@ -124,6 +134,7 @@ export type PublicUser = {
   goals: string[];
   findMeFor: string[];
   currentlyWorkingOn: string | null;
+  showcase: ShowcaseItem[] | null;
 };
 
 export type SwipeFilters = {
@@ -210,6 +221,7 @@ export type ProfilePatch = Partial<{
   findMeFor: string[];
   goals: string[];
   currentlyWorkingOn: string;
+  showcase: ShowcaseItem[];
 }>;
 
 /* ============================================================ Errors */
