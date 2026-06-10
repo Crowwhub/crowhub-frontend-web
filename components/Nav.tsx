@@ -106,16 +106,22 @@ export default function Nav() {
           Crow<span className="text-gray-5">Hub</span>
         </Link>
         <ul className="hidden md:flex gap-6 list-none">
-          {["Discover", "Connect", "Pricing", "Blog"].map((item) => (
-            <li key={item}>
-              <a
-                href="#"
-                className="text-gray-5 text-[13px] transition-colors hover:text-cream"
-              >
-                {item}
-              </a>
-            </li>
-          ))}
+          <li>
+            <Link
+              href="/why"
+              className="text-gray-5 text-[13px] transition-colors hover:text-cream"
+            >
+              Why CrowHub
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/about"
+              className="text-gray-5 text-[13px] transition-colors hover:text-cream"
+            >
+              About Us
+            </Link>
+          </li>
         </ul>
 
         {/* Auth slot */}
