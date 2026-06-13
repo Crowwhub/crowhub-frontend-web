@@ -536,6 +536,7 @@ const INTEREST_OPTIONS = [
 
 const GOAL_OPTIONS = [
   { value: "Land a job at FAANG", label: "Land a job at FAANG" },
+  { value: "Land a job at Mangos", label: "Land a job at Mangos" },
   { value: "Compose original music", label: "Compose original music" },
   { value: "Build a profitable side project", label: "Build a profitable side project" },
   { value: "Join a top design studio", label: "Join a top design studio" },

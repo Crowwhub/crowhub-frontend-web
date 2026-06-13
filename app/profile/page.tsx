@@ -165,6 +165,7 @@ const GENDER_OPTIONS = [
 
 const POPULAR_GOALS = [
   "Land a job at FAANG",
+  "Land a job at Mangos",
   "Compose original music",
   "Build a profitable side project",
   "Join a top design studio",
