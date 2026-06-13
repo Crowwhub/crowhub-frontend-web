@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import "driver.js/dist/driver.css";
 import GlassSelect from "@/components/GlassSelect";
 import Sidebar from "@/components/Sidebar";
@@ -667,6 +668,7 @@ export default function HomePage() {
   const [streak, setStreak] = useState<{ count: number; active: boolean } | null>(
     null,
   );
+  const [missingProfile, setMissingProfile] = useState<string[]>([]);
   const dragStartRef = useRef<number | null>(null);
   const dragCapturedRef = useRef(false);
   const DRAG_THRESHOLD = 6;
@@ -692,6 +694,28 @@ export default function HomePage() {
       const savedAvatar = localStorage.getItem("crowhub:avatar");
       if (savedAvatar) setAvatar(savedAvatar);
     } catch {}
+  }, []);
+
+  // Detect an incomplete profile (no company / education / showcase) to nudge
+  // the user to fill it in for better discovery.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const me = await api.me.get();
+        if (cancelled) return;
+        const missing: string[] = [];
+        if (!me.company) missing.push("company");
+        if (!me.college) missing.push("education");
+        if (!me.showcase || me.showcase.length === 0) missing.push("showcase");
+        setMissingProfile(missing);
+      } catch {
+        // Unauthenticated or backend down — skip the nudge.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Real top matches + swipe streak from the backend config endpoint.
@@ -969,6 +993,34 @@ export default function HomePage() {
                 Take a tour ↗
               </button>
             </div>
+
+            {missingProfile.length > 0 && (
+              <Link
+                href="/profile"
+                className="group mb-2 flex items-center justify-between gap-3 rounded-2xl border-[0.5px] border-sage-light/30 bg-sage-light/[0.06] px-5 py-3.5 transition-colors hover:bg-sage-light/[0.12]"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="text-[18px] flex-shrink-0">✨</span>
+                  <div className="min-w-0">
+                    <div className="animate-text-glow text-[14px] font-semibold text-cream">
+                      Complete your profile for better discovery
+                    </div>
+                    <div className="text-[12px] text-gray-5 truncate">
+                      Add your{" "}
+                      {missingProfile.length === 1
+                        ? missingProfile[0]
+                        : `${missingProfile
+                            .slice(0, -1)
+                            .join(", ")} & ${missingProfile[missingProfile.length - 1]}`}{" "}
+                      to stand out.
+                    </div>
+                  </div>
+                </div>
+                <span className="text-sage-light text-[18px] flex-shrink-0 transition-transform group-hover:translate-x-0.5">
+                  →
+                </span>
+              </Link>
+            )}
 
             <div data-tour="matches">
               <TopMatchesRow
