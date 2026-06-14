@@ -28,6 +28,7 @@ type ProfileData = {
   type: ProfileType;
   company: string;
   college: string;
+  course: string;
   aspirantOf: string;
   experience: number;
   domain: string;
@@ -50,6 +51,7 @@ const DEFAULT_PROFILE: ProfileData = {
   type: "professional",
   company: "",
   college: "",
+  course: "",
   aspirantOf: "",
   experience: 1,
   domain: "",
@@ -363,6 +365,7 @@ export default function ProfilePage() {
           type: (me.personType ?? p.type) as ProfileData["type"],
           company: me.company ?? p.company,
           college: me.college ?? p.college,
+          course: me.course ?? p.course,
           aspirantOf: me.aspirantOf ?? p.aspirantOf,
           experience: me.experience ?? p.experience,
           domain: me.domain ?? p.domain,
@@ -432,6 +435,7 @@ export default function ProfilePage() {
           : undefined,
         company: profile.company || undefined,
         college: profile.college || undefined,
+        course: profile.course || undefined,
         aspirantOf:
           profile.type === "aspirant"
             ? profile.aspirantOf || undefined
@@ -788,12 +792,19 @@ export default function ProfilePage() {
             </Section>
 
             <Section title="Education & Company">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Field label="Education">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <Field label="Course">
+                  <TextInput
+                    value={profile.course}
+                    onChange={(v) => update("course", v)}
+                    placeholder="e.g. B.Tech"
+                  />
+                </Field>
+                <Field label="College / University">
                   <TextInput
                     value={profile.college}
                     onChange={(v) => update("college", v)}
-                    placeholder="e.g. B.Tech, IIT Bombay"
+                    placeholder="e.g. IIT Bombay"
                   />
                 </Field>
                 <Field label="Company">
@@ -1170,8 +1181,10 @@ function ProfilePreview({ profile }: { profile: ProfileData }) {
             {profile.role || "Add a role"}
             {profile.company ? ` · ${profile.company}` : ""}
           </div>
-          {profile.college && (
-            <div className="text-[12px] text-gray-5">🎓 {profile.college}</div>
+          {(profile.course || profile.college) && (
+            <div className="text-[12px] text-gray-5">
+              🎓 {[profile.course, profile.college].filter(Boolean).join(" · ")}
+            </div>
           )}
           <div className="text-[12px] text-gray-5">
             {profile.location || "Add a location"} ·{" "}

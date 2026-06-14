@@ -696,29 +696,7 @@ export default function HomePage() {
     } catch {}
   }, []);
 
-  // Detect an incomplete profile (no company / education / showcase) to nudge
-  // the user to fill it in for better discovery.
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const me = await api.me.get();
-        if (cancelled) return;
-        const missing: string[] = [];
-        if (!me.company) missing.push("company");
-        if (!me.college) missing.push("education");
-        if (!me.showcase || me.showcase.length === 0) missing.push("showcase");
-        setMissingProfile(missing);
-      } catch {
-        // Unauthenticated or backend down — skip the nudge.
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Real top matches + swipe streak from the backend config endpoint.
+  // Real top matches + swipe streak + server-computed profile completeness.
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -728,6 +706,7 @@ export default function HomePage() {
         setTopMatches(config.matches.top.map(configMatchToTop));
         setMatchCount(config.matches.count);
         setStreak(config.streak);
+        setMissingProfile(config.profile?.missing ?? []);
       } catch {
         // Unauthenticated or backend down — leave the section empty.
       }

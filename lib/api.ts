@@ -57,6 +57,7 @@ export type Profile = {
   role: string | null;
   company: string | null;
   college: string | null;
+  course: string | null;
   aspirantOf: string | null;
   experience: number | null;
   experienceLevel: string | null;
@@ -200,6 +201,7 @@ export type ConfigMatch = {
 export type HomeConfig = {
   streak: { count: number; active: boolean };
   matches: { count: number; top: ConfigMatch[] };
+  profile: { missing: string[]; completedAt: string | null };
 };
 
 export type ProfilePatch = Partial<{
@@ -213,6 +215,7 @@ export type ProfilePatch = Partial<{
   role: string;
   company: string;
   college: string;
+  course: string;
   aspirantOf: string;
   experience: number;
   practiceYears: number;
