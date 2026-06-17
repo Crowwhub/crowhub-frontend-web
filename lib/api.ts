@@ -448,6 +448,28 @@ export const api = {
       return request<ReceivedLike[]>("GET", "/profile-likes/received");
     },
   },
+
+  notifications: {
+    /** Recent notifications for the signed-in user, newest first. */
+    list() {
+      return request<NotificationItem[]>("GET", "/notifications");
+    },
+    /** Unread count for the sidebar badge. */
+    unreadCount() {
+      return request<{ count: number }>("GET", "/notifications/unread-count");
+    },
+    /** Mark a single notification read. */
+    markRead(id: string) {
+      return request<{ updated: number }>(
+        "POST",
+        `/notifications/${encodeURIComponent(id)}/read`,
+      );
+    },
+    /** Mark every notification read. */
+    markAllRead() {
+      return request<{ updated: number }>("POST", "/notifications/read-all");
+    },
+  },
 };
 
 export type ReceivedLike = {
@@ -462,4 +484,27 @@ export type ReceivedLike = {
     domain: string | null;
     location: string | null;
   };
+};
+
+/* ============================================================ Notifications */
+
+// Mirrors the backend NotificationType enum.
+export type NotificationType =
+  | "NEW_MESSAGE"
+  | "COLLAB_REQUEST"
+  | "PROJECT_INVITE"
+  | "NEW_MATCH"
+  | "PROFILE_INTERACTION";
+
+// A single notification row from GET /notifications.
+export type NotificationItem = {
+  id: string;
+  type: NotificationType;
+  actorId: string | null;
+  // type-specific payload, e.g. { matchId, preview }, { itemKey }, { intent }.
+  metadata: Record<string, unknown> | null;
+  read: boolean;
+  readAt: string | null;
+  emailedAt: string | null;
+  createdAt: string; // ISO 8601
 };

@@ -21,6 +21,7 @@ export default function Sidebar() {
   const [avatar, setAvatar] = useState("🐦‍⬛");
   const [pendingRequests, setPendingRequests] = useState(0);
   const [chatUnread, setChatUnread] = useState(0);
+  const [notifUnread, setNotifUnread] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -40,7 +41,9 @@ export default function Sidebar() {
     } catch {}
   }, []);
 
-  // Poll pending swipe requests + unread chat messages every 30s.
+  // Poll pending swipe requests + unread chat + unread notifications every 30s.
+  // Also refreshes immediately on the `crowhub:notifications-changed` event so
+  // the bell badge updates the moment the user reads something.
   useEffect(() => {
     let cancelled = false;
     async function refresh() {
@@ -56,12 +59,20 @@ export default function Sidebar() {
       } catch {
         // ignore
       }
+      try {
+        const { count } = await api.notifications.unreadCount();
+        if (!cancelled) setNotifUnread(count);
+      } catch {
+        // ignore
+      }
     }
     refresh();
     const id = window.setInterval(refresh, 30_000);
+    window.addEventListener("crowhub:notifications-changed", refresh);
     return () => {
       cancelled = true;
       window.clearInterval(id);
+      window.removeEventListener("crowhub:notifications-changed", refresh);
     };
   }, [pathname]);
 
@@ -97,6 +108,7 @@ export default function Sidebar() {
       label: "Notifications",
       icon: (a) => <BellIcon active={a} />,
       href: "/notifications",
+      badge: notifUnread,
     },
     {
       id: "requests",
