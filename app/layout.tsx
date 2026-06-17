@@ -16,7 +16,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "CrowHub — Connect Beyond Boundaries",
+  title: "CrowHub — Find your people",
   description:
     "CrowHub brings real people together. Build your network, follow creators, and discover communities that matter to you.",
 };
