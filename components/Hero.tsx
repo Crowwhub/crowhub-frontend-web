@@ -4,7 +4,7 @@ import CrowSvg from "./CrowSvg";
 export default function Hero() {
   return (
     <section className="grid grid-cols-1 lg:grid-cols-[58fr_42fr] gap-10 lg:gap-20 items-start min-h-[60vh] lg:min-h-[88vh] pt-10 pb-16">
-      <div className="min-w-0 overflow-hidden">
+      <div className="min-w-0">
         <div className="inline-flex items-center gap-2 bg-gray-2 border-[0.5px] border-gray-3 rounded-full px-[14px] py-[6px] text-[11px] text-gray-5 tracking-[0.14em] uppercase mb-6">
           <div className="w-[6px] h-[6px] bg-gray-5 rounded-full animate-pulse-dot" />
           Intent-first people discovery
