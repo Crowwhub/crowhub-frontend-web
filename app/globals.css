@@ -351,3 +351,20 @@ body::before {
 .animate-btn-glow {
   animation: btn-glow-pulse 3s ease-in-out infinite;
 }
+
+/* Gentle floating for hero activity cards / network avatars. Two phases so
+   elements don't bob in unison. */
+@keyframes hero-float-a {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes hero-float-b {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+.animate-hero-float-a {
+  animation: hero-float-a 6s ease-in-out infinite;
+}
+.animate-hero-float-b {
+  animation: hero-float-b 7.5s ease-in-out infinite;
+}

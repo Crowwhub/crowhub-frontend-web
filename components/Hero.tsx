@@ -1,179 +1,215 @@
 import Link from "next/link";
-import CrowSvg from "./CrowSvg";
+
+/* Small profile chips scattered around the hero, connected by the faint
+   network arcs behind them — evokes "people in your network". */
+const ORBIT_AVATARS: {
+  emoji: string;
+  pos: string;
+  float: "a" | "b";
+  accent: string;
+}[] = [
+  { emoji: "🦅", pos: "top-[14%] left-[8%]", float: "a", accent: "#6aab7a" },
+  { emoji: "🦜", pos: "top-[30%] right-[7%]", float: "b", accent: "#e09b45" },
+  { emoji: "🕊️", pos: "top-[8%] right-[20%]", float: "a", accent: "#6aab7a" },
+  { emoji: "🐦", pos: "bottom-[34%] left-[5%]", float: "b", accent: "#e09b45" },
+  { emoji: "🦢", pos: "bottom-[20%] right-[10%]", float: "a", accent: "#6aab7a" },
+  { emoji: "🐧", pos: "top-[46%] left-[14%]", float: "b", accent: "#e09b45" },
+];
+
+/* Live-feeling activity, in CrowHub's voice (mirrors the kinds of events the
+   notification system actually produces). */
+const ACTIVITY: {
+  icon: string;
+  text: string;
+  time: string;
+  accent: string;
+  pos: string;
+  float: "a" | "b";
+}[] = [
+  {
+    icon: "🤝",
+    text: "Matched a designer with a founder",
+    time: "2 min ago",
+    accent: "#6aab7a",
+    pos: "bottom-[18%] -left-[2%] sm:left-[4%]",
+    float: "a",
+  },
+  {
+    icon: "✨",
+    text: "Connected a student to a mentor",
+    time: "4 min ago",
+    accent: "#e09b45",
+    pos: "bottom-[34%] -right-[2%] sm:right-[3%]",
+    float: "b",
+  },
+];
 
 export default function Hero() {
   return (
-    <section className="grid grid-cols-1 lg:grid-cols-[58fr_42fr] gap-10 lg:gap-20 items-start min-h-[60vh] lg:min-h-[88vh] pt-10 pb-16">
-      <div className="min-w-0">
-        <div className="inline-flex items-center gap-2 bg-gray-2 border-[0.5px] border-gray-3 rounded-full px-[14px] py-[6px] text-[11px] text-gray-5 tracking-[0.14em] uppercase mb-6">
-          <div className="w-[6px] h-[6px] bg-gray-5 rounded-full animate-pulse-dot" />
-          Intent-first people discovery
-        </div>
-        <h1
-          className="font-syne font-extrabold text-cream mb-6"
-          style={{
-            fontSize: "clamp(40px, 4.6vw, 64px)",
-            lineHeight: 1.0,
-            letterSpacing: "-2px",
-          }}
+    <section className="relative flex flex-col items-center text-center pt-6 pb-16 min-h-[80vh] overflow-hidden">
+      {/* ---- Network backdrop: faint orbit arcs + scattered avatars ---- */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 hidden sm:block"
+      >
+        <svg
+          className="absolute inset-0 h-full w-full"
+          viewBox="0 0 1000 800"
+          preserveAspectRatio="xMidYMid slice"
+          fill="none"
         >
-          Find Your
-          <br />
-          <span className="text-[#555]">People.</span>
-        </h1>
-        <div className="max-w-[440px] mb-5">
-          <p className="text-[16px] text-cream/90 leading-[1.6] font-medium mb-3">
-            People aren’t hard to find. The right people are.
-          </p>
-          <p className="text-[15px] text-gray-5 leading-[1.6] font-light mb-3">
-            Discover people through shared goals, interests, and intent.
-          </p>
-          <p className="text-[14px] text-gray-5 leading-[1.6] font-light">
-            Whether you’re looking to learn, collaborate, grow, network, or
-            simply meet like-minded people, CrowHub helps you find people with
-            the same intent.
-          </p>
-        </div>
-        <div className="flex items-center gap-3 flex-wrap">
-          <Link
-            href="/auth"
-            className="text-cream border-[0.5px] border-white/30 px-6 py-[12px] rounded-full text-[14px] font-medium cursor-pointer inline-flex items-center gap-2 bg-gradient-to-b from-white/25 to-white/10 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_6px_18px_rgba(0,0,0,0.3)] transition-all duration-150 hover:from-white/35 hover:to-white/15 hover:scale-[0.97]"
+          <g stroke="rgba(245,245,240,0.07)" strokeWidth="1">
+            <ellipse cx="500" cy="380" rx="430" ry="300" />
+            <ellipse cx="500" cy="380" rx="300" ry="210" />
+            <ellipse cx="500" cy="380" rx="170" ry="120" />
+          </g>
+          <g fill="rgba(245,245,240,0.10)">
+            <circle cx="70" cy="380" r="3" />
+            <circle cx="930" cy="380" r="3" />
+            <circle cx="500" cy="80" r="3" />
+            <circle cx="500" cy="680" r="3" />
+            <circle cx="220" cy="170" r="2.5" />
+            <circle cx="800" cy="600" r="2.5" />
+          </g>
+        </svg>
+
+        {ORBIT_AVATARS.map((a) => (
+          <div
+            key={a.emoji + a.pos}
+            className={`absolute ${a.pos} w-[44px] h-[44px] rounded-2xl flex items-center justify-center text-[20px] border-[0.5px] border-white/10 bg-gray-2/80 backdrop-blur-sm shadow-[0_8px_20px_rgba(0,0,0,0.4)] animate-hero-float-${a.float}`}
+            style={{
+              boxShadow: `0 8px 20px rgba(0,0,0,0.4), inset 0 0 0 1px ${a.accent}22`,
+            }}
           >
-            Find Your Crows →
-          </Link>
-          <Link
-            href="/why"
-            className="animate-btn-glow text-cream border-[0.5px] border-sage-light/50 bg-sage-light/[0.06] px-6 py-[12px] rounded-full text-[14px] font-medium cursor-pointer transition-all duration-150 hover:border-sage-light hover:bg-sage-light/[0.12] hover:scale-[0.98]"
-          >
-            Why CrowHub?
-          </Link>
-        </div>
+            <span aria-hidden="true">{a.emoji}</span>
+          </div>
+        ))}
       </div>
 
-      <div className="hero-right relative max-w-full h-[560px] hidden sm:block">
+      {/* ---- Eyebrow ---- */}
+      <div className="relative z-10 inline-flex items-center gap-2 bg-gray-2 border-[0.5px] border-gray-3 rounded-full px-[14px] py-[6px] text-[11px] text-gray-5 tracking-[0.14em] uppercase mb-7">
+        <div className="w-[6px] h-[6px] bg-sage-light rounded-full animate-pulse-dot" />
+        Intent-first people discovery
+      </div>
 
+      {/* ---- Headline ---- */}
+      <h1
+        className="relative z-10 font-cabinet font-black text-cream mb-5"
+        style={{
+          fontSize: "clamp(32px, 7.4vw, 84px)",
+          lineHeight: 0.92,
+          letterSpacing: "-0.04em",
+        }}
+      >
+        Hi, I’m Mr Crow
+        <br />
+        <span className="text-[#555]">from CrowHub.</span>
+      </h1>
+
+      {/* ---- Subhead ---- */}
+      <div className="relative z-10 max-w-[540px] mb-3 px-4">
+        <p className="text-[17px] text-cream/90 leading-[1.55] font-medium">
+          Tell me your intention and domain you are looking for — and I’ll find
+          your people to swipe through.
+        </p>
+        <p className="mt-3 text-[14px] text-gray-5 leading-[1.6] font-light">
+          People who share your goals, interests, and intent — to learn,
+          collaborate, grow, ask referrals , get hired or simply connect.
+        </p>
+      </div>
+
+      {/* ---- Mascot + floating activity cards ---- */}
+      <div className="relative z-10 w-full flex justify-center -mt-4 sm:-mt-10 mb-6">
+        {/* soft glow seating the mascot */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 z-0 pointer-events-none"
+          className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] rounded-full blur-3xl opacity-30"
           style={{
-            // background:
-            //    "radial-gradient(ellipse 70% 55% at 30% 38%, rgba(74,124,89,0.32) 0%, transparent 75%), radial-gradient(ellipse 65% 50% at 72% 48%, rgba(196,124,43,0.28) 0%, transparent 75%)",
+            background:
+              "radial-gradient(circle, rgba(106,171,122,0.35), rgba(224,155,69,0.18) 45%, transparent 70%)",
           }}
         />
 
+        {/* Mobile-only partial orbit rings behind the mascot. The wide ring is
+            clipped by the section's overflow-hidden → reads as a partial orbit.
+            Desktop uses the full network backdrop above instead. */}
         <div
-          className="profile-card card-1 absolute w-[265px] rounded-3xl overflow-hidden border-[0.5px] border-gray-3 bg-gray-2 top-[18px] left-[10px] z-[2]"
-          style={{
-            boxShadow:
-              "0 18px 36px -16px rgba(0,0,0,0.6), 0 4px 12px rgba(0,0,0,0.35)",
-          }}
+          aria-hidden="true"
+          className="sm:hidden pointer-events-none absolute left-1/2 top-[44%] -translate-x-1/2 -translate-y-1/2 z-0 w-[340px] h-[340px] rounded-full border border-white/[0.10]"
+        />
+        <div
+          aria-hidden="true"
+          className="sm:hidden pointer-events-none absolute left-1/2 top-[44%] -translate-x-1/2 -translate-y-1/2 z-0 w-[500px] h-[500px] rounded-full border border-white/[0.05]"
         >
-          <div
-            className="h-[200px] flex items-center justify-center relative overflow-hidden"
-            style={{
-              background:
-                "radial-gradient(ellipse 90% 80% at 30% 25%, #3a6048 0%, #244335 35%, #1a2a20 70%, #0d1612 100%)",
-            }}
-          >
-            <div
-              className="absolute font-syne text-[80px] font-extrabold top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap tracking-[-4px] pointer-events-none"
-              style={{ color: "rgba(106,171,122,0.08)" }}
-            >
-              CH
-            </div>
-            <div className="relative z-[1]">
-              <CrowSvg accent="#6aab7a" width={140} height={120} />
-            </div>
-          </div>
-          <div className="p-5">
-            <div className="font-syne text-[17px] font-bold text-cream mb-[3px]">
-              Anika Kapoor
-            </div>
-            <div className="text-xs text-gray-5 mb-4 tracking-[0.03em]">
-              Product Designer · Mumbai
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-[6px] text-xs text-gray-5">
-                <div className="w-[7px] h-[7px] bg-sage-light rounded-full" />
-                Active now
-              </div>
-              <button className="bg-cream text-ink border-0 px-[18px] py-[7px] rounded-full text-xs font-medium cursor-pointer">
-                Follow
-              </button>
-            </div>
-          </div>
+          {/* a couple of faint nodes on the outer ring */}
+          <span className="absolute top-1/2 -left-[3px] w-1.5 h-1.5 rounded-full bg-white/20" />
+          <span className="absolute -top-[3px] left-[30%] w-1.5 h-1.5 rounded-full bg-white/15" />
+          <span className="absolute top-[64%] -right-[3px] w-1.5 h-1.5 rounded-full bg-white/15" />
         </div>
 
-        <div
-          className="profile-card card-2 absolute w-[265px] rounded-3xl overflow-hidden border-[0.5px] border-gray-3 bg-gray-2 top-[90px] right-[10px] z-[1]"
-          style={{
-            boxShadow:
-              "0 18px 36px -16px rgba(0,0,0,0.6), 0 4px 12px rgba(0,0,0,0.35)",
-          }}
-        >
-          <div
-            className="h-[200px] flex items-center justify-center relative overflow-hidden"
+        <div className="relative w-full max-w-[680px] flex justify-center">
+          {/* Transparent-background mascot at public/crow-hero.png — floats
+              directly on the page, no crop/mask needed. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/crow-hero.png"
+            alt="CrowHub mascot"
+            className="relative z-[1] w-[clamp(360px,88vw,820px)] h-auto select-none"
+            draggable={false}
             style={{
-              background:
-                "radial-gradient(ellipse 90% 80% at 30% 25%, #5e3c1c 0%, #3d2a14 35%, #261a0c 70%, #150e07 100%)",
+              // Fade the lower body into the page so the cutout doesn't read as
+              // a pasted image — the crow appears to emerge from the background.
+              WebkitMaskImage:
+                "linear-gradient(to bottom, #000 72%, transparent 97%)",
+              maskImage:
+                "linear-gradient(to bottom, #000 72%, transparent 97%)",
             }}
-          >
-            <div
-              className="absolute font-syne text-[80px] font-extrabold top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap tracking-[-4px] pointer-events-none"
-              style={{ color: "rgba(224,155,69,0.08)" }}
-            >
-              CH
-            </div>
-            <div className="relative z-[1]">
-              <CrowSvg accent="#e09b45" width={140} height={120} />
-            </div>
-          </div>
-          <div className="p-5">
-            <div className="font-syne text-[17px] font-bold text-cream mb-[3px]">
-              Rohan Shah
-            </div>
-            <div className="text-xs text-gray-5 mb-4 tracking-[0.03em]">
-              Startup Founder · Delhi
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-[6px] text-xs text-gray-5">
-                <div className="w-[7px] h-[7px] bg-amber-light rounded-full" />
-                Active now
-              </div>
-              <button className="bg-cream text-ink border-0 px-[18px] py-[7px] rounded-full text-xs font-medium cursor-pointer">
-                Follow
-              </button>
-            </div>
-          </div>
-        </div>
+          />
 
-        <div className="absolute w-[46px] h-[46px] rounded-full bg-gray-2 border-[0.5px] border-gray-3 flex items-center justify-center text-gray-5 z-[3] top-[120px] right-2">
-          <svg
-            className="w-5 h-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#888888"
-            strokeWidth={1.5}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          </svg>
+          {/* Activity cards (sm+ only — too cramped on mobile) */}
+          {ACTIVITY.map((c) => (
+            <div
+              key={c.text}
+              className={`hidden sm:flex absolute ${c.pos} z-[2] items-start gap-3 w-[230px] rounded-2xl border-[0.5px] border-white/10 bg-gray-2/70 backdrop-blur-md p-3.5 text-left shadow-[0_18px_40px_-12px_rgba(0,0,0,0.7)] animate-hero-float-${c.float}`}
+            >
+              <span
+                className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-[15px] border-[0.5px] border-white/10"
+                style={{ background: `${c.accent}22` }}
+                aria-hidden="true"
+              >
+                {c.icon}
+              </span>
+              <span className="min-w-0">
+                <span className="block text-[13px] font-medium text-cream leading-snug">
+                  {c.text}
+                </span>
+                <span className="mt-1 flex items-center gap-1.5 text-[11px] text-gray-5">
+                  <span
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{ background: c.accent }}
+                  />
+                  {c.time}
+                </span>
+              </span>
+            </div>
+          ))}
         </div>
-        <div className="absolute w-[46px] h-[46px] rounded-full bg-gray-2 border-[0.5px] border-gray-3 flex items-center justify-center text-gray-5 z-[3] bottom-[140px] left-0">
-          <svg
-            className="w-5 h-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#888888"
-            strokeWidth={1.5}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z" />
-            <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
-          </svg>
-        </div>
+      </div>
+
+      {/* ---- CTAs ---- */}
+      <div className="relative z-10 flex items-center gap-3 flex-wrap justify-center">
+        <Link
+          href="/auth"
+          className="text-cream border-[0.5px] border-white/30 px-7 py-[13px] rounded-full text-[15px] font-medium cursor-pointer inline-flex items-center gap-2 bg-gradient-to-b from-white/25 to-white/10 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_6px_18px_rgba(0,0,0,0.3)] transition-all duration-150 hover:from-white/35 hover:to-white/15 hover:scale-[0.97]"
+        >
+          Find Your Crows →
+        </Link>
+        <Link
+          href="/why"
+          className="animate-btn-glow text-cream border-[0.5px] border-sage-light/50 bg-sage-light/[0.06] px-7 py-[13px] rounded-full text-[15px] font-medium cursor-pointer transition-all duration-150 hover:border-sage-light hover:bg-sage-light/[0.12] hover:scale-[0.98]"
+        >
+          Why CrowHub?
+        </Link>
       </div>
     </section>
   );

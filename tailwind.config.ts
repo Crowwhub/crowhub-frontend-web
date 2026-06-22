@@ -18,6 +18,7 @@ const config: Config = {
       },
       fontFamily: {
         syne: ["var(--font-syne)", "sans-serif"],
+        cabinet: ["var(--font-cabinet)", "sans-serif"],
         sans: ["var(--font-dm-sans)", "sans-serif"],
       },
       keyframes: {

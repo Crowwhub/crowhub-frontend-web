@@ -1,11 +1,22 @@
 import type { Metadata } from "next";
 import { Syne, DM_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 const syne = Syne({
   subsets: ["latin"],
   weight: ["400", "600", "700", "800"],
   variable: "--font-syne",
+});
+
+// Cabinet Grotesk (Fontshare) — self-hosted. Used for the hero display headline.
+const cabinet = localFont({
+  src: [
+    { path: "../fonts/cabinet-grotesk-extrabold.woff2", weight: "800", style: "normal" },
+    { path: "../fonts/cabinet-grotesk-black.woff2", weight: "900", style: "normal" },
+  ],
+  variable: "--font-cabinet",
+  display: "swap",
 });
 
 const dmSans = DM_Sans({
@@ -27,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${syne.variable} ${dmSans.variable}`}>
+    <html lang="en" className={`${syne.variable} ${cabinet.variable} ${dmSans.variable}`}>
       <body className="font-sans bg-ink text-cream">{children}</body>
     </html>
   );
